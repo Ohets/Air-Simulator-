@@ -99,7 +99,7 @@ function render(t){
   const spec=planes[current];
   const targetSpeed=throttle/100*spec.speed/3.6;
   speed+=(targetSpeed-speed)*dt*.22;
-  const inputX=gyroEnabled?gyroX:steerX, inputY=gyroEnabled?gyroY:steerY;
+  const inputX=-(gyroEnabled?gyroX:steerX), inputY=-(gyroEnabled?gyroY:steerY);
   const targetRoll=-inputX*.62;
   const targetPitch=inputY*.38;
   rollAngle+=(targetRoll-rollAngle)*Math.min(1,dt*1.8);
@@ -123,8 +123,19 @@ function render(t){
  }
  const cameraPos=new THREE.Vector3(),lookAt=new THREE.Vector3();
  if(view===0){
-  cameraPos.set(0,7,23);planeGroup.localToWorld(cameraPos);
-  lookAt.set(0,0,-10);planeGroup.localToWorld(lookAt);
+  // Follow from behind using the aircraft heading only, so the camera stays level
+  // and moves around behind the plane even during a 180-degree turn or bank.
+  const followDistance=23, lookDistance=12;
+  cameraPos.set(
+   planeGroup.position.x-Math.sin(heading)*followDistance,
+   planeGroup.position.y+7,
+   planeGroup.position.z+Math.cos(heading)*followDistance
+  );
+  lookAt.set(
+   planeGroup.position.x+Math.sin(heading)*lookDistance,
+   planeGroup.position.y,
+   planeGroup.position.z-Math.cos(heading)*lookDistance
+  );
   camera.position.lerp(cameraPos,1-Math.exp(-dt*3.3));camera.lookAt(lookAt);
  }else if(view===1){
   cameraPos.set(20,6,7);planeGroup.localToWorld(cameraPos);
