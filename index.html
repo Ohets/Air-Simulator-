@@ -19,7 +19,7 @@
   <div><div class="brand">AIR <span>SIMULATOR</span></div><div class="stat" id="planeName">Cessna 172 · Trainer</div></div>
   <div class="rightStats"><div class="stat">GESCHWINDIGKEIT<strong><span id="speed">0</span> <small>km/h</small></strong></div><div class="stat">HÖHE<strong><span id="altitude">120</span> <small>m</small></strong></div><div class="stat">CREDITS<strong>✦ <span id="credits">1500</span></strong></div></div>
  </div>
- <div class="actions"><button class="uiBtn" id="hangarBtn">✈ HANGAR</button><button class="uiBtn" id="missionsBtn">🎯 MISSIONEN</button><button class="uiBtn" id="viewBtn">KAMERA: FOLLOW</button><button class="uiBtn" id="gyroBtn">GYRO: AUS</button><button class="uiBtn" id="pauseBtn">Ⅱ PAUSE</button></div>
+ <div class="actions"><button class="uiBtn" id="hangarBtn">✈ HANGAR</button><button class="uiBtn" id="missionsBtn">🎯 MISSIONEN</button><button class="uiBtn" id="viewBtn">KAMERA: FOLLOW</button><button class="uiBtn" id="autopilotBtn">AUTOPILOT: AUS</button><button class="uiBtn" id="gyroBtn">GYRO: AUS</button><button class="uiBtn" id="pauseBtn">Ⅱ PAUSE</button></div>
  <div class="crosshair"></div>
  <div class="bottomInfo panel"><b id="status">BEREIT ZUM FLUG</b><br>Joystick / Gyro: Nicken & Rollen<br>Gas rechts · Kamera wechseln</div>
  <div class="flightControls">
@@ -77,7 +77,7 @@ function skipMission(i){if(completedMissions.has(i))return;const m=missions[i];i
 function finishMission(i){if(i<0||completedMissions.has(i))return;const m=missions[i];completedMissions.add(i);credits+=m.reward;activeMission=-1;engineFailed=false;setNightMode(false);if(missionMarker){scene.remove(missionMarker);missionMarker=null;missionMarkerRing=null;}persistMission();ui();alert('Mission geschafft: '+m.name+'! Du erhältst '+m.reward+' Credits.');renderMissions();}
 function save(){try{localStorage.setItem('airSimSave',JSON.stringify({credits,owned:[...owned],current,completedMissions:[...completedMissions]}))}catch{}}
 function ui(){ $('credits').textContent=credits.toLocaleString('de-AT');$('hangarCredits').textContent=credits.toLocaleString('de-AT');$('planeName').textContent=planes[current].name+' · '+planes[current].type;$('speed').textContent=Math.round(Math.max(0,speed*3.6));$('altitude').textContent=Math.max(0,Math.round(120+altitude));$('throttleVal').textContent=throttle+'%';}
-let scene,camera,renderer,planeGroup,clock=new THREE.Clock(),speed=0,altitude=0,throttle=35,paused=false,gear=true,view=0,steerX=0,steerY=0,heading=0,flightTime=0,gyroEnabled=false,gyroZeroBeta=null,gyroZeroGamma=null,gyroX=0,gyroY=0,rollAngle=0,pitchAngle=0,yawRate=0,stalling=false,rainPoints=null,rainPositions=null,audioCtx=null,engineOsc=null,engineGain=null,rainGain=null,rainFilter=null,rainNoiseSource=null;
+let scene,camera,renderer,planeGroup,clock=new THREE.Clock(),speed=0,altitude=0,throttle=35,paused=false,gear=true,view=0,steerX=0,steerY=0,heading=0,autopilotEnabled=false,autopilotHeading=0,autopilotAltitude=120,flightTime=0,gyroEnabled=false,gyroZeroBeta=null,gyroZeroGamma=null,gyroX=0,gyroY=0,rollAngle=0,pitchAngle=0,yawRate=0,stalling=false,rainPoints=null,rainPositions=null,audioCtx=null,engineOsc=null,engineGain=null,rainGain=null,rainFilter=null,rainNoiseSource=null;
 try{
  scene=new THREE.Scene();scene.background=new THREE.Color(0x8cccf5);scene.fog=new THREE.Fog(0x8cccf5,450,2300);
  camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,4000);
@@ -177,12 +177,15 @@ function render(t){
   if(stalling){pitchAngle+=( -.42-pitchAngle)*Math.min(1,dt*1.8);rollAngle+=Math.sin(flightTime*18)*dt*.09;speed=Math.max(0,speed-dt*1.8);$('status').textContent='⚠ STRÖMUNGSABRISS · NOSE SENKT SICH';$('status').style.color='#ff9d72';}
   else $('status').style.color='';
   // Umgekehrte Links-rechts-Steuerung: Joystick nach rechts lässt das Flugzeug nach links fliegen.
-  const inputX=-(gyroEnabled?-gyroX:steerX);
-  const inputY=-(gyroEnabled?-gyroY:steerY);
+  const headingError=Math.atan2(Math.sin(autopilotHeading-heading),Math.cos(autopilotHeading-heading));
+  const inputX=autopilotEnabled?Math.max(-.45,Math.min(.45,headingError*1.15)):-(gyroEnabled?-gyroX:steerX);
+  const inputY=autopilotEnabled?0:-(gyroEnabled?-gyroY:steerY);
   const targetRoll=inputX*.72;
   // Umgekehrte Hoch-runter-Steuerung: Joystick nach unten senkt die Nase,
   // Joystick nach oben hebt die Nase.
-  const targetPitch=stalling?-.42:-inputY*.48;
+  const altitudeError=autopilotAltitude-altitude;
+  const autopilotPitch=Math.max(-.22,Math.min(.22,altitudeError*.004));
+  const targetPitch=stalling?-.42:(autopilotEnabled?autopilotPitch:-inputY*.48);
   rollAngle+=(targetRoll-rollAngle)*Math.min(1,dt*2.2);
   pitchAngle+=(targetPitch-pitchAngle)*Math.min(1,dt*1.7);
   // Coordinate heading with banking so a sustained right bank produces a right turn.
@@ -258,6 +261,7 @@ gameCanvas.addEventListener('pointermove',e=>{if((view!==2&&view!==3)||cockpitTo
 function endCockpitLook(e){if(cockpitTouchId===e.pointerId)cockpitTouchId=null;}
 gameCanvas.addEventListener('pointerup',endCockpitLook);gameCanvas.addEventListener('pointercancel',endCockpitLook);
 $('viewBtn').onclick=()=>{view=(view+1)%4;$('viewBtn').textContent=['KAMERA: FOLLOW','KAMERA: SEITE','KAMERA: COCKPIT','KAMERA: PASSAGIER'][view];$('passengerFrame').style.display=view===3?'block':'none';if(view!==2){cockpitLookYaw=0;cockpitLookPitch=0;}if(view!==3){passengerLookYaw=0;passengerLookPitch=0;}};
+$('autopilotBtn').onclick=()=>{autopilotEnabled=!autopilotEnabled;if(autopilotEnabled){autopilotHeading=heading;autopilotAltitude=Math.max(0,altitude);steerX=0;steerY=0;gyroX=0;gyroY=0;$('autopilotBtn').textContent='AUTOPILOT: AN';$('status').textContent='AUTOPILOT AKTIV · KURS UND HÖHE HALTEN';}else{$('autopilotBtn').textContent='AUTOPILOT: AUS';$('status').textContent='AUTOPILOT AUS · MANUELLE STEUERUNG';}};
 $('gyroBtn').onclick=()=>{gyroEnabled=!gyroEnabled;if(gyroEnabled){gyroZeroBeta=null;gyroZeroGamma=null;$('gyroBtn').textContent='GYRO: AN';$('status').textContent='HANDY GERADE HALTEN ZUR KALIBRIERUNG'}else{$('gyroBtn').textContent='GYRO: AUS';gyroX=0;gyroY=0}};
 addEventListener('deviceorientation',e=>{if(!gyroEnabled||e.beta==null||e.gamma==null)return;if(gyroZeroBeta===null){gyroZeroBeta=e.beta;gyroZeroGamma=e.gamma}gyroY=Math.max(-1,Math.min(1,(e.beta-gyroZeroBeta)/28));gyroX=Math.max(-1,Math.min(1,(e.gamma-gyroZeroGamma)/28))});
 $('pauseBtn').onclick=()=>{paused=true;$('pauseOverlay').classList.add('show')};$('resumeBtn').onclick=()=>{$('pauseOverlay').classList.remove('show');paused=false};$('pauseHangarBtn').onclick=()=>{$('pauseOverlay').classList.remove('show');openHangar()};
