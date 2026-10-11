@@ -59,12 +59,14 @@ const saved=(()=>{try{return JSON.parse(localStorage.getItem('airSimSave')||'{}'
 let credits=Number.isFinite(saved.credits)?saved.credits:1500,owned=new Set(Array.isArray(saved.owned)?saved.owned:[0]),current=Math.max(0,Math.min(19,saved.current||0));if(!owned.has(0))owned.add(0);
 function save(){try{localStorage.setItem('airSimSave',JSON.stringify({credits,owned:[...owned],current}))}catch{}}
 function ui(){ $('credits').textContent=credits.toLocaleString('de-AT');$('hangarCredits').textContent=credits.toLocaleString('de-AT');$('planeName').textContent=planes[current].name+' · '+planes[current].type;$('speed').textContent=Math.round(Math.max(0,speed*3.6));$('altitude').textContent=Math.max(0,Math.round(120+altitude));$('throttleVal').textContent=throttle+'%';}
-let scene,camera,renderer,planeGroup,clock=new THREE.Clock(),speed=0,altitude=0,throttle=35,paused=false,gear=true,view=0,steerX=0,steerY=0,heading=0,flightTime=0,gyroEnabled=false,gyroZeroBeta=null,gyroZeroGamma=null,gyroX=0,gyroY=0,rollAngle=0,pitchAngle=0,yawRate=0;
+let scene,camera,renderer,planeGroup,clock=new THREE.Clock(),speed=0,altitude=0,throttle=35,paused=false,gear=true,view=0,steerX=0,steerY=0,heading=0,flightTime=0,gyroEnabled=false,gyroZeroBeta=null,gyroZeroGamma=null,gyroX=0,gyroY=0,rollAngle=0,pitchAngle=0,yawRate=0,stalling=false,rainPoints=null,rainPositions=null,audioCtx=null,engineOsc=null,engineGain=null,rainGain=null,rainFilter=null,rainNoiseSource=null;
 try{
  scene=new THREE.Scene();scene.background=new THREE.Color(0x8cccf5);scene.fog=new THREE.Fog(0x8cccf5,450,2300);
  camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,4000);
  renderer=new THREE.WebGLRenderer({antialias:false,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=false;renderer.outputColorSpace=THREE.SRGBColorSpace;document.body.appendChild(renderer.domElement);
- const hemi=new THREE.HemisphereLight(0xd8edff,0x657b55,2.1);scene.add(hemi);const sun=new THREE.DirectionalLight(0xffffff,2.3);sun.position.set(200,400,100);scene.add(sun);
+ // Dauerregen: sichtbare Regentropfen um das Flugzeug.
+ const rainGeo=new THREE.BufferGeometry();rainPositions=new Float32Array(900*3);for(let i=0;i<900;i++){rainPositions[i*3]=(Math.random()-.5)*150;rainPositions[i*3+1]=Math.random()*90-25;rainPositions[i*3+2]=(Math.random()-.5)*150;}rainGeo.setAttribute('position',new THREE.BufferAttribute(rainPositions,3));const rainMat=new THREE.PointsMaterial({color:0xd8edff,size:.16,transparent:true,opacity:.7,depthWrite:false});rainPoints=new THREE.Points(rainGeo,rainMat);scene.add(rainPoints);
+ const hemi=new THREE.HemisphereLight(0xd8edff,0x657b55,1.45);scene.add(hemi);const sun=new THREE.DirectionalLight(0xffffff,2.3);sun.position.set(200,400,100);scene.add(sun);
  const ground=new THREE.Mesh(new THREE.PlaneGeometry(5000,5000),new THREE.MeshStandardMaterial({color:0x5e8d54,roughness:1}));ground.rotation.x=-Math.PI/2;ground.position.y=-15;scene.add(ground);
  const ocean=new THREE.Mesh(new THREE.PlaneGeometry(5000,5000),new THREE.MeshStandardMaterial({color:0x3f9fca,roughness:.65}));ocean.rotation.x=-Math.PI/2;ocean.position.set(0,-18,-2400);scene.add(ocean);
  // Patchwork fields and roads create a wide, lightweight landscape.
@@ -99,13 +101,17 @@ function render(t){
   const spec=planes[current];
   const targetSpeed=throttle/100*spec.speed/3.6;
   speed+=(targetSpeed-speed)*dt*.22;
+  const stallSpeed=Math.max(24,spec.speed/3.6*.13);
+  stalling=altitude>4&&speed<stallSpeed;
+  if(stalling){pitchAngle+=( -.42-pitchAngle)*Math.min(1,dt*1.8);rollAngle+=Math.sin(flightTime*18)*dt*.09;speed=Math.max(0,speed-dt*1.8);$('status').textContent='⚠ STRÖMUNGSABRISS · NOSE SENKT SICH';$('status').style.color='#ff9d72';}
+  else $('status').style.color='';
   // Umgekehrte Links-rechts-Steuerung: Joystick nach rechts lässt das Flugzeug nach links fliegen.
   const inputX=-(gyroEnabled?-gyroX:steerX);
   const inputY=-(gyroEnabled?-gyroY:steerY);
   const targetRoll=inputX*.72;
   // Umgekehrte Hoch-runter-Steuerung: Joystick nach unten senkt die Nase,
   // Joystick nach oben hebt die Nase.
-  const targetPitch=-inputY*.48;
+  const targetPitch=stalling?-.42:-inputY*.48;
   rollAngle+=(targetRoll-rollAngle)*Math.min(1,dt*2.2);
   pitchAngle+=(targetPitch-pitchAngle)*Math.min(1,dt*1.7);
   // Coordinate heading with banking so a sustained right bank produces a right turn.
@@ -124,9 +130,13 @@ function render(t){
   if(speed>18) altitude+=forward.y*speed*dt*4.5;
   else altitude-=dt*2.2;
   altitude=Math.max(-5,Math.min(1800,altitude));
-  planeGroup.position.y=5+altitude*.22+Math.sin(flightTime*1.2)*.22;
+  if(stalling)altitude-=dt*(5+Math.max(0,stallSpeed-speed)*.22);
+  altitude=Math.max(-5,Math.min(1800,altitude));
+  planeGroup.position.y=5+altitude*.22+Math.sin(flightTime*1.2)*.22+(stalling?Math.sin(flightTime*24)*.16:0);
   flightTime+=dt;
-  $('status').textContent=speed<5?'BEREIT ZUM FLUG':altitude>40?'IM FLUG · KAMERA FOLGT':speed<40?'ROLLEN / STARTLAUF':'STARTEN · STEIGFLUG';
+  if(!stalling){$('status').textContent=speed<5?'BEREIT ZUM FLUG':altitude>40?'IM FLUG · KAMERA FOLGT':speed<40?'ROLLEN / STARTLAUF':'STARTEN · STEIGFLUG';}
+  if(engineOsc&&engineGain){engineOsc.frequency.setTargetAtTime(42+speed*2.1+throttle*.9,audioCtx.currentTime,.12);engineGain.gain.setTargetAtTime(.018+throttle*.00055,audioCtx.currentTime,.15);}
+  if(rainPoints&&planeGroup){rainPoints.position.copy(planeGroup.position);const p=rainPoints.geometry.attributes.position.array;for(let i=0;i<p.length;i+=3){p[i+1]-=dt*(45+speed*.25);p[i]+=dt*-(forward.x*speed*.25);p[i+2]+=dt*-(forward.z*speed*.25);if(p[i+1]<-28){p[i+1]=60+Math.random()*25;p[i]=(Math.random()-.5)*150;p[i+2]=(Math.random()-.5)*150;}}rainPoints.geometry.attributes.position.needsUpdate=true;}
  }
  const cameraPos=new THREE.Vector3(),lookAt=new THREE.Vector3();
  if(view===0){
@@ -166,7 +176,8 @@ function moveStick(e){let r=stick.getBoundingClientRect(),cx=r.left+r.width/2,cy
 stick.addEventListener('pointerdown',e=>{dragging=true;stick.setPointerCapture(e.pointerId);moveStick(e)});stick.addEventListener('pointermove',e=>{if(dragging)moveStick(e)});function release(){dragging=false;steerX=0;steerY=0;knob.style.transform='translate(0,0)'}stick.addEventListener('pointerup',release);stick.addEventListener('pointercancel',release);
 $('donateBtn').onclick=()=>window.open(paypal,'_blank','noopener,noreferrer');
 $('earnBtn').onclick=()=>{credits+=100;save();ui();renderHangar();$('status').textContent='FLUGBONUS +100 CREDITS'};
-$('startBtn').onclick=()=>{$('startOverlay').classList.remove('show');paused=false};$('startHangarBtn').onclick=()=>{$('startOverlay').classList.remove('show');openHangar()};
+function startFlightAudio(){if(audioCtx){if(audioCtx.state==='suspended')audioCtx.resume();return;}try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();const master=audioCtx.createGain();master.gain.value=.8;master.connect(audioCtx.destination);engineOsc=audioCtx.createOscillator();engineOsc.type='sawtooth';engineGain=audioCtx.createGain();engineGain.gain.value=.025;const engineFilter=audioCtx.createBiquadFilter();engineFilter.type='lowpass';engineFilter.frequency.value=260;engineOsc.connect(engineFilter);engineFilter.connect(engineGain);engineGain.connect(master);engineOsc.start();const buffer=audioCtx.createBuffer(1,audioCtx.sampleRate*2,audioCtx.sampleRate);const data=buffer.getChannelData(0);for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*.35;rainNoiseSource=audioCtx.createBufferSource();rainNoiseSource.buffer=buffer;rainNoiseSource.loop=true;rainFilter=audioCtx.createBiquadFilter();rainFilter.type='lowpass';rainFilter.frequency.value=850;rainGain=audioCtx.createGain();rainGain.gain.value=.13;rainNoiseSource.connect(rainFilter);rainFilter.connect(rainGain);rainGain.connect(master);rainNoiseSource.start();}catch(e){console.warn('Audio nicht verfügbar',e);}}
+$('startBtn').onclick=()=>{startFlightAudio();$('startOverlay').classList.remove('show');paused=false};$('startHangarBtn').onclick=()=>{startFlightAudio();$('startOverlay').classList.remove('show');openHangar()};
 ui();renderHangar();
 </script>
 </body></html>
