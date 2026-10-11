@@ -101,9 +101,10 @@ function render(t){
   speed+=(targetSpeed-speed)*dt*.22;
   // Umgekehrte Links-rechts-Steuerung: Joystick nach rechts lässt das Flugzeug nach links fliegen.
   const inputX=-(gyroEnabled?-gyroX:steerX);
-  const inputY=gyroEnabled?-gyroY:steerY;
+  const inputY=-(gyroEnabled?-gyroY:steerY);
   const targetRoll=inputX*.72;
-  // In Three.js zeigt die Flugzeugnase entlang -Z: negative X-Rotation hebt die Nase.
+  // Umgekehrte Hoch-runter-Steuerung: Joystick nach unten senkt die Nase,
+  // Joystick nach oben hebt die Nase.
   const targetPitch=-inputY*.48;
   rollAngle+=(targetRoll-rollAngle)*Math.min(1,dt*2.2);
   pitchAngle+=(targetPitch-pitchAngle)*Math.min(1,dt*1.7);
