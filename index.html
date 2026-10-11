@@ -238,7 +238,7 @@ function render(t){
   // Passenger seat just behind the wing: look out across the wing and engine.
   $('passengerFrame').style.display='block';
   const scale=planes[current].size;
-  cameraPos.set(.25*scale,.42*scale,.8*scale);planeGroup.localToWorld(cameraPos);
+  cameraPos.set(.25*scale,.42*scale,2.1*scale);planeGroup.localToWorld(cameraPos);
   const passengerLookRotation=new THREE.Euler(passengerLookPitch,passengerLookYaw,0,'YXZ');
   const passengerDirection=new THREE.Vector3(1.0,-.11,.2).applyEuler(passengerLookRotation).normalize();
   lookAt.copy(cameraPos).add(passengerDirection.multiplyScalar(14*scale));
