@@ -129,13 +129,14 @@ function render(t){
  }
  const cameraPos=new THREE.Vector3(),lookAt=new THREE.Vector3();
  if(view===0){
-  // Follow the aircraft model itself: camera offset and look direction use its
-  // current orientation, including pitch and bank, instead of heading alone.
-  cameraPos.set(0,7,23);
+  // Attach the follow camera behind the aircraft's tail. Keep a 23-unit
+  // gap from the tail and follow the model's full orientation.
+  const tailOffset=planes[current].size*5.3;
+  cameraPos.set(0,7,tailOffset+23);
   planeGroup.localToWorld(cameraPos);
-  lookAt.set(0,0,-12);
+  lookAt.set(0,0,0);
   planeGroup.localToWorld(lookAt);
-  camera.position.lerp(cameraPos,1-Math.exp(-dt*4.5));
+  camera.position.copy(cameraPos);
   camera.lookAt(lookAt);
  }else if(view===1){
   cameraPos.set(20,6,7);planeGroup.localToWorld(cameraPos);
