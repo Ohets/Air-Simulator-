@@ -115,15 +115,15 @@ function render(t){
   planeGroup.rotation.y=heading;
   planeGroup.rotation.z=rollAngle;
   planeGroup.rotation.x=pitchAngle;
-  const lift=Math.max(0,(speed-18)/48);
-  // Pulling the joystick down raises the nose and increases climb; pushing up lowers it.
-  altitude+=(lift*(.25+inputY*.95)-Math.max(0,inputY)*.12)*dt*16;
-  if(speed<22) altitude-=dt*2.2;
+  // Die Flugbahn folgt der tatsächlichen Flugzeugnase statt nur dem Kamera-/Heading-Winkel.
+  // Dadurch beeinflussen Nicken und Rollen die Bewegungsrichtung direkt.
+  const forward=new THREE.Vector3(0,0,-1).applyQuaternion(planeGroup.quaternion).normalize();
+  planeGroup.position.x+=forward.x*speed*dt;
+  planeGroup.position.z+=forward.z*speed*dt;
+  if(speed>18) altitude+=forward.y*speed*dt*4.5;
+  else altitude-=dt*2.2;
   altitude=Math.max(-5,Math.min(1800,altitude));
-  planeGroup.position.x+=Math.sin(heading)*speed*dt;
-  planeGroup.position.z-=Math.cos(heading)*speed*dt;
   planeGroup.position.y=5+altitude*.22+Math.sin(flightTime*1.2)*.22;
-  if(speed>25&&altitude<1&&inputY>.12) altitude+=Math.min(1.1,(speed-25)*.015)*dt*15;
   flightTime+=dt;
   $('status').textContent=speed<5?'BEREIT ZUM FLUG':altitude>40?'IM FLUG · KAMERA FOLGT':speed<40?'ROLLEN / STARTLAUF':'STARTEN · STEIGFLUG';
  }
