@@ -207,9 +207,11 @@ function render(t){
   lookAt.set(0,0,-5);planeGroup.localToWorld(lookAt);
   camera.position.lerp(cameraPos,1-Math.exp(-dt*2.5));camera.lookAt(lookAt);
  }else{
+  // Cockpit camera is rigidly attached to the aircraft: position and orientation
+  // follow the plane immediately, including pitch, roll and turns.
   cameraPos.set(0,1.25,-2.2);planeGroup.localToWorld(cameraPos);
-  lookAt.set(0,.8,-120);planeGroup.localToWorld(lookAt);
-  camera.position.lerp(cameraPos,1-Math.exp(-dt*7));camera.lookAt(lookAt);
+  camera.position.copy(cameraPos);
+  camera.quaternion.copy(planeGroup.quaternion);
  }
  ui();renderer.render(scene,camera);
 }
