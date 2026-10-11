@@ -161,7 +161,11 @@ function render(t){
   if(Math.abs(gearTarget-gearProgress)<.008)gearProgress=gearTarget;
   updateGearVisual(gearProgress);
   if(activeMission===3&&!engineFailed&&flightTime-missionStartedAt>12){engineFailed=true;$('status').textContent='⚠ TRIEBWERKSAUSFALL! NOTLANDUNG';}
-  const targetSpeed=(engineFailed?0:throttle/100*spec.speed/3.6);
+  // Eine nach unten gerichtete Flugzeugnase erhöht die Geschwindigkeit leicht,
+  // ähnlich wie beim Beschleunigen im Sinkflug. Bei Triebwerksausfall bleibt der Effekt aus.
+  const noseDownAmount=Math.max(0,Math.min(1,(-pitchAngle-.05)/.4));
+  const noseDownBoost=engineFailed?0:noseDownAmount*(spec.speed*.10/3.6);
+  const targetSpeed=(engineFailed?0:throttle/100*spec.speed/3.6+noseDownBoost);
   speed+=(targetSpeed-speed)*dt*(engineFailed?.32:.22);
   const stallSpeed=Math.max(24,spec.speed/3.6*.13);
   stalling=altitude>4&&speed<stallSpeed;
