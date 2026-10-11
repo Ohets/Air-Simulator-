@@ -178,7 +178,7 @@ function render(t){
   if(stalling){pitchAngle+=( -.42-pitchAngle)*Math.min(1,dt*1.8);rollAngle+=Math.sin(flightTime*18)*dt*.09;speed=Math.max(0,speed-dt*1.8);$('status').textContent='⚠ STRÖMUNGSABRISS · NOSE SENKT SICH';$('status').style.color='#ff9d72';}
   else $('status').style.color='';
   // Umgekehrte Links-rechts-Steuerung: Joystick nach rechts lässt das Flugzeug nach links fliegen.
-  const landingHeading=Math.atan2(planeGroup.position.x,planeGroup.position.z+180);
+  const landingHeading=planeGroup.position.z < -800 ? Math.PI : (planeGroup.position.z > 420 ? Math.atan2(planeGroup.position.x,planeGroup.position.z-420) : Math.max(-.5,Math.min(.5,planeGroup.position.x*.004)));
   const selectedHeading=autoLandingEnabled?landingHeading:autopilotHeading;
   const headingError=Math.atan2(Math.sin(selectedHeading-heading),Math.cos(selectedHeading-heading));
   const inputX=(autoLandingEnabled||autopilotEnabled)?Math.max(-.55,Math.min(.55,headingError*1.15)):-(gyroEnabled?-gyroX:steerX);
