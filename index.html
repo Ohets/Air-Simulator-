@@ -243,9 +243,12 @@ function render(t){
   const scale=planes[current].size;
   cameraPos.set(.25*scale,.42*scale,2.1*scale);planeGroup.localToWorld(cameraPos);
   const passengerLookRotation=new THREE.Euler(passengerLookPitch,passengerLookYaw,0,'YXZ');
-  const passengerDirection=new THREE.Vector3(1.0,-.11,.2).applyEuler(passengerLookRotation).normalize();
+  const passengerDirection=new THREE.Vector3(1.0,-.11,.2).applyEuler(passengerLookRotation).normalize().applyQuaternion(planeGroup.quaternion);
   lookAt.copy(cameraPos).add(passengerDirection.multiplyScalar(14*scale));
-  camera.position.copy(cameraPos);camera.up.set(0,1,0);camera.lookAt(lookAt);
+  camera.position.copy(cameraPos);
+  // Kamera bleibt fest am Passagiersitz und dreht sich mit dem Flugzeug mit.
+  camera.up.set(0,1,0).applyQuaternion(planeGroup.quaternion).normalize();
+  camera.lookAt(lookAt);
  }
  ui();renderer.render(scene,camera);
 }
