@@ -145,6 +145,8 @@ mesh(new THREE.BoxGeometry(3.2*scale,.14*scale,1.8*scale),wingMat,0,.4*scale,4.2
 mesh(new THREE.BoxGeometry(.2*scale,1.6*scale,2.1*scale),wingMat,0,.85*scale,4.5*scale);
 mesh(new THREE.BoxGeometry(2.5*scale,.12*scale,1.1*scale),dark,0,-.4*scale,-.8*scale);
 mesh(new THREE.SphereGeometry(.48*scale,12,8),glass,0,.34*scale,-2.2*scale,1,.55,1.3);
+// Visible engine nacelles beneath the wings, especially noticeable from the passenger window.
+if(index>=2&&index<=16){for(const side of [-1,1]){const engine=mesh(new THREE.CylinderGeometry(.34*scale,.42*scale,1.65*scale,14),dark,side*3.65*scale,-.48*scale,.35*scale);engine.rotation.x=Math.PI/2;const intake=mesh(new THREE.CircleGeometry(.29*scale,14),new THREE.MeshStandardMaterial({color:0x080f17,metalness:.25,roughness:.6,side:THREE.DoubleSide}),side*3.65*scale,-.48*scale,-.49*scale);intake.rotation.x=-Math.PI/2;}}
 // Three visible landing-gear assemblies with hinged legs and rotating deployment motion.
 addLandingGear(-2.65*scale,.65*scale,false);addLandingGear(2.65*scale,.65*scale,false);addLandingGear(0,-3.1*scale,true);
 if(index!==0&&index!==1&&index!==2&&index!==3&&index!==4&&index!==17&&index!==18){for(let side of [-1,1]){for(let j=0;j<Math.min(12,Math.round(4*scale));j++){let win=mesh(new THREE.BoxGeometry(.08*scale,.17*scale,.22*scale),glass,side*.53*scale,.13*scale,(-1.1+j*.48)*scale);win.rotation.y=side*.1}}}
@@ -233,12 +235,13 @@ function render(t){
   const cockpitLookRotation=new THREE.Euler(cockpitLookPitch,cockpitLookYaw,0,'YXZ');
   camera.quaternion.copy(planeGroup.quaternion).multiply(new THREE.Quaternion().setFromEuler(cockpitLookRotation));
  }else{
-  // Passenger seat beside the right-side window. The view tracks the aircraft,
-  // looking outward and slightly forward so the landscape and wing remain visible.
+  // Passenger seat just behind the wing: look out across the wing and engine.
   $('passengerFrame').style.display='block';
   const scale=planes[current].size;
-  cameraPos.set(.72*scale,.22*scale,-.15*scale);planeGroup.localToWorld(cameraPos);
-  lookAt.set(10*scale,.45*scale,-2.8*scale);planeGroup.localToWorld(lookAt);
+  cameraPos.set(.25*scale,.42*scale,.8*scale);planeGroup.localToWorld(cameraPos);
+  const passengerLookRotation=new THREE.Euler(passengerLookPitch,passengerLookYaw,0,'YXZ');
+  const passengerDirection=new THREE.Vector3(1.0,-.11,.2).applyEuler(passengerLookRotation).normalize();
+  lookAt.copy(cameraPos).add(passengerDirection.multiplyScalar(14*scale));
   camera.position.copy(cameraPos);camera.up.set(0,1,0);camera.lookAt(lookAt);
  }
  ui();renderer.render(scene,camera);
@@ -248,13 +251,13 @@ addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updat
 function openHangar(){paused=true;$('hangarOverlay').classList.add('show');renderHangar()}
 function closeHangar(){ $('hangarOverlay').classList.remove('show');paused=false}
 function renderHangar(){$('hangarCredits').textContent=credits.toLocaleString('de-AT');$('planeGrid').innerHTML='';planes.forEach((p,i)=>{let card=document.createElement('div');card.className='planeCard';let ownedNow=owned.has(i),selected=current===i;card.innerHTML='<div class="planeIcon">'+p.emoji+'</div><h3>'+p.name+'</h3><p>'+p.type+'<br>Max. ca. '+p.speed+' km/h</p><div class="price">'+(p.price===0?'GRATIS':'✦ '+p.price.toLocaleString('de-AT'))+'</div><button class="uiBtn '+(selected?'primary':'')+'">'+(selected?'AUSGEWÄHLT':ownedNow?'FLIEGEN':'KAUFEN')+'</button>';card.querySelector('button').onclick=()=>{if(ownedNow){current=i;makePlane(i);resetFlight();save();ui();renderHangar();closeHangar()}else if(credits>=p.price){credits-=p.price;owned.add(i);current=i;makePlane(i);resetFlight();save();ui();renderHangar();closeHangar()}else{$('status').textContent='ZU WENIG CREDITS — FLUGBONUS ODER PAYPAL';alert('Du hast zu wenig Credits. Du kannst den kostenlosen Flugbonus nutzen oder die PayPal-Spendenseite öffnen. Eine Spende schreibt Credits nicht automatisch gut.')}};$('planeGrid').appendChild(card)})}
-$('hangarBtn').onclick=openHangar;$('closeHangar').onclick=closeHangar;$('missionsBtn').onclick=openMissions;$('closeMissions').onclick=()=>{$('missionsOverlay').classList.remove('show');paused=false};$('missionBackToFlight').onclick=()=>{$('missionsOverlay').classList.remove('show');paused=false};let cockpitLookYaw=0,cockpitLookPitch=0,cockpitTouchId=null,cockpitLastX=0,cockpitLastY=0;
+$('hangarBtn').onclick=openHangar;$('closeHangar').onclick=closeHangar;$('missionsBtn').onclick=openMissions;$('closeMissions').onclick=()=>{$('missionsOverlay').classList.remove('show');paused=false};$('missionBackToFlight').onclick=()=>{$('missionsOverlay').classList.remove('show');paused=false};let cockpitLookYaw=0,cockpitLookPitch=0,passengerLookYaw=0,passengerLookPitch=0,cockpitTouchId=null,cockpitLastX=0,cockpitLastY=0;
 const gameCanvas=renderer.domElement;
-gameCanvas.addEventListener('pointerdown',e=>{if(view!==2||paused||$('startOverlay').classList.contains('show')||$('hangarOverlay').classList.contains('show')||$('missionsOverlay').classList.contains('show')||$('pauseOverlay').classList.contains('show'))return;cockpitTouchId=e.pointerId;cockpitLastX=e.clientX;cockpitLastY=e.clientY;gameCanvas.setPointerCapture(e.pointerId);});
-gameCanvas.addEventListener('pointermove',e=>{if(view!==2||cockpitTouchId!==e.pointerId)return;const dx=e.clientX-cockpitLastX,dy=e.clientY-cockpitLastY;cockpitLastX=e.clientX;cockpitLastY=e.clientY;cockpitLookYaw=Math.max(-1.35,Math.min(1.35,cockpitLookYaw-dx*.006));cockpitLookPitch=Math.max(-.65,Math.min(.65,cockpitLookPitch-dy*.005));});
+gameCanvas.addEventListener('pointerdown',e=>{if((view!==2&&view!==3)||paused||$('startOverlay').classList.contains('show')||$('hangarOverlay').classList.contains('show')||$('missionsOverlay').classList.contains('show')||$('pauseOverlay').classList.contains('show'))return;cockpitTouchId=e.pointerId;cockpitLastX=e.clientX;cockpitLastY=e.clientY;gameCanvas.setPointerCapture(e.pointerId);});
+gameCanvas.addEventListener('pointermove',e=>{if((view!==2&&view!==3)||cockpitTouchId!==e.pointerId)return;const dx=e.clientX-cockpitLastX,dy=e.clientY-cockpitLastY;cockpitLastX=e.clientX;cockpitLastY=e.clientY;if(view===2){cockpitLookYaw=Math.max(-1.35,Math.min(1.35,cockpitLookYaw-dx*.006));cockpitLookPitch=Math.max(-.65,Math.min(.65,cockpitLookPitch-dy*.005));}else{passengerLookYaw=Math.max(-1.15,Math.min(1.15,passengerLookYaw-dx*.006));passengerLookPitch=Math.max(-.5,Math.min(.5,passengerLookPitch-dy*.005));}});
 function endCockpitLook(e){if(cockpitTouchId===e.pointerId)cockpitTouchId=null;}
 gameCanvas.addEventListener('pointerup',endCockpitLook);gameCanvas.addEventListener('pointercancel',endCockpitLook);
-$('viewBtn').onclick=()=>{view=(view+1)%4;$('viewBtn').textContent=['KAMERA: FOLLOW','KAMERA: SEITE','KAMERA: COCKPIT','KAMERA: PASSAGIER'][view];$('passengerFrame').style.display=view===3?'block':'none';if(view!==2){cockpitLookYaw=0;cockpitLookPitch=0;}};
+$('viewBtn').onclick=()=>{view=(view+1)%4;$('viewBtn').textContent=['KAMERA: FOLLOW','KAMERA: SEITE','KAMERA: COCKPIT','KAMERA: PASSAGIER'][view];$('passengerFrame').style.display=view===3?'block':'none';if(view!==2){cockpitLookYaw=0;cockpitLookPitch=0;}if(view!==3){passengerLookYaw=0;passengerLookPitch=0;}};
 $('gyroBtn').onclick=()=>{gyroEnabled=!gyroEnabled;if(gyroEnabled){gyroZeroBeta=null;gyroZeroGamma=null;$('gyroBtn').textContent='GYRO: AN';$('status').textContent='HANDY GERADE HALTEN ZUR KALIBRIERUNG'}else{$('gyroBtn').textContent='GYRO: AUS';gyroX=0;gyroY=0}};
 addEventListener('deviceorientation',e=>{if(!gyroEnabled||e.beta==null||e.gamma==null)return;if(gyroZeroBeta===null){gyroZeroBeta=e.beta;gyroZeroGamma=e.gamma}gyroY=Math.max(-1,Math.min(1,(e.beta-gyroZeroBeta)/28));gyroX=Math.max(-1,Math.min(1,(e.gamma-gyroZeroGamma)/28))});
 $('pauseBtn').onclick=()=>{paused=true;$('pauseOverlay').classList.add('show')};$('resumeBtn').onclick=()=>{$('pauseOverlay').classList.remove('show');paused=false};$('pauseHangarBtn').onclick=()=>{$('pauseOverlay').classList.remove('show');openHangar()};
