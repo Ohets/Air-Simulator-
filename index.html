@@ -137,16 +137,6 @@ function render(t){
  }
  ui();renderer.render(scene,camera);
 }
-let dt=Math.min(clock.getDelta(),.05);if(!paused){let target=throttle/100*planes[current].speed/3.6;speed+=(target-speed)*dt*.22;heading+=steerX*dt*.48;altitude+=(-steerY*speed*.04)*dt;altitude=Math.max(-5,Math.min(1400,altitude));planeGroup.rotation.z+=( -steerX*.42-planeGroup.rotation.z)*dt*2.3;planeGroup.rotation.x+=(steerY*.35-planeGroup.rotation.x)*dt*2;planeGroup.rotation.y=heading;
-planeGroup.position.x+=Math.sin(heading)*speed*dt;planeGroup.position.z-=Math.cos(heading)*speed*dt;planeGroup.position.y=5+altitude*.22+Math.sin(flightTime*1.2)*.4;
-if(speed>27&&altitude<2)altitude+=Math.min(1.4,(speed-27)*.018)*dt*18;else if(speed<16&&altitude>0)altitude-=dt*3;
-flightTime+=dt;$('status').textContent=speed<5?'BEREIT ZUM FLUG':altitude>40?'IM FLUG · AUTOPILOT AUS':speed<40?'ROLLEN / STARTLAUF':'STARTEN · STEIGFLUG';
-}
-const pos=planeGroup.position;
-if(view===0){camera.position.lerp(new THREE.Vector3(pos.x+Math.sin(heading)*5, pos.y+7, pos.z+20),.07);camera.lookAt(pos.x,pos.y,pos.z-8)}
-else if(view===1){camera.position.lerp(new THREE.Vector3(pos.x+Math.sin(heading)*20,pos.y+6,pos.z+Math.cos(heading)*20),.07);camera.lookAt(pos.x,pos.y,pos.z)}
-else{camera.position.lerp(new THREE.Vector3(pos.x,pos.y+1.3,pos.z-2.5),.08);camera.lookAt(pos.x+Math.sin(heading)*80,pos.y+1,pos.z-100)}
-ui();renderer.render(scene,camera)}
 requestAnimationFrame(render);
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.5))});
 function openHangar(){paused=true;$('hangarOverlay').classList.add('show');renderHangar()}
