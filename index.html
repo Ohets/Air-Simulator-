@@ -692,7 +692,7 @@ $('privateBucketTestBtn').onclick=async()=>{
    testValue,
    testedAt:new Date().toISOString()
   };
-  const path=user.id+'/'+Date.now()+'-test-value.json';
+  const path=Date.now()+'-'+crypto.randomUUID()+'-test-value.json';
   const {error}=await supabase.storage.from('testzahlen').upload(path,new Blob([JSON.stringify(testRecord,null,2)],{type:'application/json'}),{upsert:false,contentType:'application/json'});
   if(error)throw error;
   $('privateBucketTestInput').value='';
