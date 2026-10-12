@@ -39,7 +39,7 @@
  <div class="bottomInfo panel"><b id="status">BEREIT ZUM FLUG</b><br>Joystick / Gyro: Nicken & Rollen<br>Gas rechts · Kamera wechseln</div>
  <div class="flightControls">
   <div class="stick" id="stick"><div class="knob" id="knob"></div><div class="controlLabel">FLUGSTEUERUNG</div></div>
-  <div class="smallControls"><button class="uiBtn" id="gearBtn">▱ FAHRWERK</button><button class="uiBtn" id="glideBtn">🪂 SEGELN: AUS</button><button class="uiBtn" id="brakeBtn">🛑 BREMSEN</button><button class="uiBtn" id="resetBtn">↻ RESET</button></div>
+  <div class="smallControls"><button class="uiBtn" id="gearBtn">▱ FAHRWERK</button><button class="uiBtn" id="brakeBtn">🛑 BREMSEN</button><button class="uiBtn" id="resetBtn">↻ RESET</button></div>
   <div class="throttle"><label for="throttle">THROTTLE</label><input id="throttle" type="range" min="0" max="100" value="35"><label id="throttleVal">35%</label></div>
  </div>
  <div id="footControls" style="display:none;position:absolute;right:12px;bottom:18px;gap:8px;flex-direction:column;align-items:stretch;pointer-events:auto">
@@ -139,7 +139,7 @@ function skipMission(i){if(completedMissions.has(i))return;const m=missions[i];i
 function finishMission(i){if(i<0||completedMissions.has(i))return;const m=missions[i];completedMissions.add(i);credits+=m.reward;activeMission=-1;$('footControls').style.display='none';engineFailed=false;setNightMode(false);if(missionMarker){scene.remove(missionMarker);missionMarker=null;missionMarkerRing=null;}persistMission();ui();alert('Mission geschafft: '+m.name+'! Du erhältst '+m.reward+' Credits.');renderMissions();}
 function save(){try{localStorage.setItem('airSimSave',JSON.stringify({credits,owned:[...owned],current,completedMissions:[...completedMissions]}))}catch{}}
 function ui(){ $('credits').textContent=credits.toLocaleString('de-AT');$('hangarCredits').textContent=credits.toLocaleString('de-AT');$('planeName').textContent=planes[current].name+' · '+planes[current].type;$('speed').textContent=Math.round(Math.max(0,speed*3.6));$('altitude').textContent=Math.max(0,Math.round(120+altitude));$('throttleVal').textContent=throttle+'%';}
-let scene,camera,renderer,planeGroup,clock=new THREE.Clock(),speed=0,altitude=0,throttle=35,paused=false,gear=true,gliding=false,braking=false,view=0,steerX=0,steerY=0,heading=0,autopilotEnabled=false,autopilotHeading=0,autopilotAltitude=120,autoLandingEnabled=false,flightTime=0,gyroEnabled=false,gyroZeroBeta=null,gyroZeroGamma=null,gyroX=0,gyroY=0,rollAngle=0,pitchAngle=0,yawRate=0,stalling=false,rainPoints=null,rainPositions=null,audioCtx=null,engineOsc=null,engineGain=null,rainGain=null,rainFilter=null,rainNoiseSource=null;
+let scene,camera,renderer,planeGroup,clock=new THREE.Clock(),speed=0,altitude=0,throttle=35,paused=false,gear=true,braking=false,view=0,steerX=0,steerY=0,heading=0,autopilotEnabled=false,autopilotHeading=0,autopilotAltitude=120,autoLandingEnabled=false,flightTime=0,gyroEnabled=false,gyroZeroBeta=null,gyroZeroGamma=null,gyroX=0,gyroY=0,rollAngle=0,pitchAngle=0,yawRate=0,stalling=false,rainPoints=null,rainPositions=null,audioCtx=null,engineOsc=null,engineGain=null,rainGain=null,rainFilter=null,rainNoiseSource=null;
 let flightRouteTarget=null,flightRouteName='';
 try{
  scene=new THREE.Scene();scene.background=new THREE.Color(0x8cccf5);scene.fog=new THREE.Fog(0x8cccf5,450,2300);
@@ -427,7 +427,7 @@ makePlane(current);
 let crashActive=false,crashStartTime=0,crashEffect=null,lastCrashAt=-10;
 function clearCrashEffect(){if(crashEffect){scene.remove(crashEffect);crashEffect.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose();}});crashEffect=null;}crashActive=false;}
 function startCrashAnimation(kmh){if(crashActive||flightTime-lastCrashAt<4)return;crashActive=true;crashStartTime=flightTime;lastCrashAt=flightTime;paused=true;autoLandingEnabled=false;autopilotEnabled=false;planeGroup.rotation.x=-.32;planeGroup.rotation.z=.22;planeGroup.position.y=-13.3;crashEffect=new THREE.Group();crashEffect.position.copy(planeGroup.position);const flash=new THREE.Mesh(new THREE.SphereGeometry(planes[current].size*2.8,12,10),new THREE.MeshBasicMaterial({color:0xff8a22,transparent:true,opacity:.95}));flash.position.y=2;crashEffect.add(flash);for(let i=0;i<16;i++){const spark=new THREE.Mesh(new THREE.SphereGeometry(.6+Math.random()*1.2,6,5),new THREE.MeshBasicMaterial({color:i%3===0?0xffdf65:0xff4b16,transparent:true,opacity:.9}));spark.position.set((Math.random()-.5)*16,Math.random()*10,(Math.random()-.5)*14);spark.userData.vx=(Math.random()-.5)*18;spark.userData.vy=8+Math.random()*22;spark.userData.vz=(Math.random()-.5)*18;crashEffect.add(spark);}for(let i=0;i<9;i++){const smoke=new THREE.Mesh(new THREE.SphereGeometry(2+Math.random()*2.5,7,6),new THREE.MeshBasicMaterial({color:0x555b60,transparent:true,opacity:.55}));smoke.position.set((Math.random()-.5)*8,5+i*2,(Math.random()-.5)*7);smoke.userData.smoke=true;crashEffect.add(smoke);}scene.add(crashEffect);$('status').textContent='CRASH! ZU SCHNELL GELANDET · '+Math.round(kmh)+' KM/H';if(activeMission>=0)failMission('Du bist bei der Landung zu schnell gewesen.');}
-function resetFlight(){clearCrashEffect();speed=0;altitude=0;heading=0;steerX=0;steerY=0;rollAngle=0;pitchAngle=0;yawRate=0;flightTime=0;gliding=false;braking=false;$('glideBtn').textContent='🪂 SEGELN: AUS';$('brakeBtn').style.background='';planeGroup.position.set(0,-13.3,0);planeGroup.rotation.set(0,0,0);$('status').textContent='BEREIT ZUM FLUG';}
+function resetFlight(){clearCrashEffect();speed=0;altitude=0;heading=0;steerX=0;steerY=0;rollAngle=0;pitchAngle=0;yawRate=0;flightTime=0;braking=false;$('brakeBtn').style.background='';planeGroup.position.set(0,-13.3,0);planeGroup.rotation.set(0,0,0);$('status').textContent='BEREIT ZUM FLUG';}
 let onFoot=false,footGroup=null,footYaw=0,footCameraYaw=0,footCameraPitch=-.12,lastShotAt=0;
 function setOnFootMode(enabled){
  onFoot=enabled;document.body.classList.toggle('footMode',enabled);
@@ -494,9 +494,9 @@ function render(t){
   const noseDownAmount=Math.max(0,Math.min(1,(-pitchAngle-.05)/.4));
   const noseDownBoost=engineFailed?0:noseDownAmount*(spec.speed*.10/3.6);
   if(autoLandingEnabled&&!engineFailed){const landingThrottle=Math.max(20,Math.min(65,landingSpeedLimit()/spec.speed*115));throttle+=(landingThrottle-throttle)*Math.min(1,dt*.35);$('throttle').value=Math.round(throttle);$('throttleVal').textContent=Math.round(throttle)+'%';}
-  const targetSpeed=gliding?Math.max(0,speed-dt*(braking?7.5:0.18)):(engineFailed?0:throttle/100*spec.speed/3.6+noseDownBoost);
-  speed+=(targetSpeed-speed)*dt*(gliding?.9:(engineFailed?.32:.22));
-  if(braking&&!gliding)speed=Math.max(0,speed-dt*11);
+  const targetSpeed=engineFailed?0:throttle/100*spec.speed/3.6+noseDownBoost;
+  speed+=(targetSpeed-speed)*dt*(engineFailed?.32:.22);
+  if(braking)speed=Math.max(0,speed-dt*11);
   const stallSpeed=Math.max(24,spec.speed/3.6*.13);
   stalling=altitude>4&&speed<stallSpeed;
   if(stalling){pitchAngle+=( -.42-pitchAngle)*Math.min(1,dt*1.8);rollAngle+=Math.sin(flightTime*18)*dt*.09;speed=Math.max(0,speed-dt*1.8);$('status').textContent='⚠ STRÖMUNGSABRISS · NOSE SENKT SICH';$('status').style.color='#ff9d72';}
@@ -532,7 +532,7 @@ function render(t){
   planeGroup.position.z+=forward.z*speed*dt;
   if(speed>18) altitude+=forward.y*speed*dt*4.5;
   else altitude-=dt*2.2;
-  if(gliding&&altitude>0)altitude-=dt*(braking?1.5:0.45);
+  
   altitude=Math.max(0,Math.min(1800,altitude));
   if(stalling)altitude-=dt*(5+Math.max(0,stallSpeed-speed)*.22);
   altitude=Math.max(0,Math.min(1800,altitude));
@@ -629,7 +629,7 @@ $('gyroBtn').onclick=()=>{gyroEnabled=!gyroEnabled;if(gyroEnabled){gyroZeroBeta=
 addEventListener('deviceorientation',e=>{if(!gyroEnabled||e.beta==null||e.gamma==null)return;if(gyroZeroBeta===null){gyroZeroBeta=e.beta;gyroZeroGamma=e.gamma}gyroY=Math.max(-1,Math.min(1,(e.beta-gyroZeroBeta)/28));gyroX=Math.max(-1,Math.min(1,(e.gamma-gyroZeroGamma)/28))});
 $('pauseBtn').onclick=()=>{paused=true;$('pauseOverlay').classList.add('show')};$('resumeBtn').onclick=()=>{$('pauseOverlay').classList.remove('show');paused=false};$('pauseHangarBtn').onclick=()=>{$('pauseOverlay').classList.remove('show');openHangar()};
 $('resetBtn').onclick=resetFlight;$('gearBtn').onclick=()=>{gear=!gear;gearTarget=gear?1:0;$('gearBtn').textContent=gear?'▱ FAHRWERK: AUS':'▱ FAHRWERK: EIN';$('status').textContent=gear?'FAHRWERK FÄHRT EIN …':'FAHRWERK FÄHRT AUS …'};
-$('glideBtn').onclick=()=>{gliding=!gliding;if(gliding){throttle=0;$('throttle').value=0;$('throttleVal').textContent='0%';autoLandingEnabled=false;autopilotEnabled=false;$('autoLandBtn').textContent='AUTO-LANDUNG: AUS';$('autopilotBtn').textContent='AUTOPILOT: AUS';$('glideBtn').textContent='🪂 SEGELN: AN';$('status').textContent='SEGELFLUG AKTIV · GESCHWINDIGKEIT HALTEN';}else{$('glideBtn').textContent='🪂 SEGELN: AUS';$('status').textContent='SEGELFLUG BEENDET';}};
+
 const brakeBtn=$('brakeBtn');const releaseBrake=()=>{braking=false;brakeBtn.style.background='';};brakeBtn.addEventListener('pointerdown',e=>{e.preventDefault();braking=true;brakeBtn.setPointerCapture?.(e.pointerId);brakeBtn.style.background='#9b2f2f';$('status').textContent='BREMSEN AKTIV';});brakeBtn.addEventListener('pointerup',releaseBrake);brakeBtn.addEventListener('pointercancel',releaseBrake);brakeBtn.addEventListener('lostpointercapture',releaseBrake);
 $('throttle').addEventListener('input',e=>{throttle=+e.target.value;ui()});
 const stick=$('stick'),knob=$('knob');let dragging=false;
