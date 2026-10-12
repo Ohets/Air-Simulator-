@@ -153,20 +153,20 @@ function addOvergrownCity(cx,cz,spreadX,spreadZ,count){
 
 // NEW YORK: an island skyline appears after the long ocean crossing.
  const nySceneStart=scene.children.length,nyBoundsStart=cityBuildingBounds.length;
- const nyIsland=new THREE.Mesh(new THREE.PlaneGeometry(1450,1900),new THREE.MeshStandardMaterial({color:0x777d72,roughness:1}));
+ const nyIsland=new THREE.Mesh(new THREE.PlaneGeometry(1900,2400),new THREE.MeshStandardMaterial({color:0x777d72,roughness:1}));
  nyIsland.rotation.x=-Math.PI/2;nyIsland.position.set(40,-14.62,-3700);scene.add(nyIsland);
  const nyRoadMat=new THREE.MeshStandardMaterial({color:0x343b42,roughness:1}),nyParkMat=new THREE.MeshStandardMaterial({color:0x46734c,roughness:1});
- for(let x=-240;x<=260;x+=72){const road=new THREE.Mesh(new THREE.PlaneGeometry(12,1500),nyRoadMat);road.rotation.x=-Math.PI/2;road.position.set(x,-14.48,-3700);scene.add(road);}
- for(let z=-3000;z>=-4400;z-=95){const road=new THREE.Mesh(new THREE.PlaneGeometry(650,11),nyRoadMat);road.rotation.x=-Math.PI/2;road.position.set(15,-14.47,z);scene.add(road);}
+ for(let x=-850;x<=850;x+=170){const road=new THREE.Mesh(new THREE.PlaneGeometry(16,1900),nyRoadMat);road.rotation.x=-Math.PI/2;road.position.set(x,-14.48,-3700);scene.add(road);}
+ for(let z=-2850;z>=-4700;z-=190){const road=new THREE.Mesh(new THREE.PlaneGeometry(1750,14),nyRoadMat);road.rotation.x=-Math.PI/2;road.position.set(15,-14.47,z);scene.add(road);}
  for(const [x,z,w,d] of [[-210,-3260,55,130],[-170,-3900,70,150],[190,-4150,65,130],[260,-3330,45,110],[-300,-4100,65,120]]){const park=new THREE.Mesh(new THREE.PlaneGeometry(w,d),nyParkMat);park.rotation.x=-Math.PI/2;park.position.set(x,-14.45,z);scene.add(park);}
  const nyColors=[0xb7c5d0,0xc7c6bb,0x7f9caf,0xa9bbc5,0x8f9eaa,0xd1c8b8];
  const nyGlass=new THREE.MeshStandardMaterial({color:0x39718e,roughness:.22,metalness:.28,emissive:0x17394a,emissiveIntensity:.55});
  const nyWindowMat=new THREE.MeshBasicMaterial({color:0xffe8a3});
  const nyBlueWindowMat=new THREE.MeshBasicMaterial({color:0x7fd8ff});
  for(let ix=0;ix<9;ix++)for(let iz=0;iz<14;iz++){
-   const x=-380+ix*95+(iz%2?12:0)+(Math.random()-.5)*8,z=-3000-iz*135+(Math.random()-.5)*12;
-   if(Math.abs(x+10)<48&&iz>4&&iz<10)continue;
-   const w=25+Math.random()*19,d=28+Math.random()*27,h=45+Math.random()*175,baseY=-14.5;
+   const x=-680+ix*170+(iz%2?18:0)+(Math.random()-.5)*8,z=-2850-iz*190+(Math.random()-.5)*10;
+   if(Math.abs(x)<255&&iz>3&&iz<12)continue;
+   const w=28+Math.random()*14,d=30+Math.random()*18,h=45+Math.random()*175,baseY=-14.5;
    building(x,baseY+h/2,z,w,h,d,nyColors[(ix*3+iz)%nyColors.length]);
    // Bright facade bands make the New York blocks stand out clearly from the sky.
    const facadeZ=z-d/2-.22,windowCount=Math.max(3,Math.floor(w/7));
