@@ -66,10 +66,7 @@
 
 <div class="overlay" id="privateTestOverlay"><div class="modal panel" style="max-width:440px">
 <div class="badge">PRIVATER TEST</div><h2 style="margin:8px 0">Testwert speichern</h2>
-<p class="notice">Wenn du auf „Testdaten speichern“ tippst, werden deine E-Mail-Adresse aus deinem angemeldeten Konto und deine künstlichen Testdaten gemeinsam in einer JSON-Datei im privaten Supabase-Bucket „testzahlen“ gespeichert. Andere Nutzer sollen diese Dateien nicht lesen können. Gib niemals echte Passwörter oder vertrauliche Daten ein.</p>
-<label for="privateBucketTestInput" class="muted" style="display:block;text-align:left;margin-top:10px">Testtext / Zahlen / Symbole (künstliche Testdaten)</label>
 <input id="privateBucketTestInput" type="password" autocomplete="off" maxlength="100" placeholder="Nur künstliche Testdaten" style="width:100%;margin:6px 0">
-<label style="display:flex;gap:8px;align-items:flex-start;text-align:left;font-size:12px;line-height:1.45;margin:8px 0"><input id="marketingShareConsent" type="checkbox" style="margin-top:3px;flex-shrink:0"><span><strong>Freiwillige separate Einwilligung:</strong> Ich willige ausdrücklich ein, dass meine E-Mail-Adresse zu Werbe- und Marketingzwecken an Werbe- und Marketingunternehmen weitergegeben werden darf. Diese Einwilligung ist optional und keine Voraussetzung für das Spiel oder das Speichern meiner Testdaten. Ich kann sie für die Zukunft widerrufen; Informationen zum Widerruf und zur verantwortlichen Person müssen in der Datenschutzerklärung leicht zugänglich sein.</span></label>
 <button class="uiBtn primary" id="privateBucketTestBtn" style="width:100%">TESTDATEN SPEICHERN</button>
 <div id="privateBucketTestStatus" class="notice" role="status" aria-live="polite"></div>
 <button class="uiBtn" id="privateTestContinueBtn" style="width:100%;margin-top:8px">WEITER ZUM SPIEL</button>
@@ -681,7 +678,7 @@ $('privateBucketTestBtn').onclick=async()=>{
  const testValue=$('privateBucketTestInput').value.trim();
  if(!testValue){status.textContent='Bitte gib zuerst künstliche Testzahlen ein.';return;}
   if(testValue.length>100){status.textContent='Bitte gib maximal 100 Zeichen ein.';return;}
- btn.disabled=true;status.textContent='E-Mail-Adresse und künstliche Testdaten werden gemeinsam gespeichert …';
+ btn.disabled=true;status.textContent='Speichern …';
  try{
   const {data:sessionData,error:sessionError}=await supabase.auth.getSession();
   if(sessionError)throw sessionError;
