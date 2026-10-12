@@ -232,6 +232,31 @@ try{
  for(let z=sfZ-1200;z<=sfZ+1350;z+=115){const o=new THREE.Mesh(new THREE.PlaneGeometry(2300,10),sfRoad);o.rotation.x=-Math.PI/2;o.position.set(sfX-950,-14.48,z);scene.add(o);}
  for(let ix=0;ix<18;ix++)for(let iz=0;iz<19;iz++){const x=sfX-2000+ix*112+(Math.random()-.5)*20,z=sfZ-1180+iz*112+(Math.random()-.5)*20,downtown=x>sfX-1250&&x<sfX-450&&z>sfZ-500&&z<sfZ+550,w=27+Math.random()*36,d=28+Math.random()*35,h=downtown?35+Math.random()*175:10+Math.random()*38,mat=Math.random()>.68?sfGlass:new THREE.MeshStandardMaterial({color:[0xc8bca7,0xa6a49a,0x8d9697,0xb9b4a7,0x737f86][(ix+iz)%5],roughness:.85}),b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);b.position.set(x,-14.5+h/2,z);scene.add(b);}
  for(let i=0;i<12;i++){const hill=new THREE.Mesh(new THREE.SphereGeometry(1,9,7),new THREE.MeshStandardMaterial({color:[0x7f875b,0x9b946a,0x6d8058][i%3],roughness:1}));hill.scale.set(180+Math.random()*180,55+Math.random()*75,150+Math.random()*210);hill.position.set(sfX+250+(i%4)*185,8,sfZ-1150+Math.floor(i/4)*410);scene.add(hill);}
+
+ // MORE TRUE-TO-LIFE GOLDEN GATE LANDSCAPE:
+ // Marin Headlands north of the strait: layered coastal ridges, scrub and exposed rock.
+ const sfHeadlandMats=[0x7c805b,0x8e8b68,0x6c7757,0x999174].map(c=>new THREE.MeshStandardMaterial({color:c,roughness:1,flatShading:true}));
+ for(let i=0;i<19;i++){const side=i%2?1:-1,hill=new THREE.Mesh(new THREE.SphereGeometry(1,12,8),sfHeadlandMats[i%sfHeadlandMats.length]);hill.scale.set(210+Math.random()*210,65+Math.random()*95,190+Math.random()*260);hill.position.set(sfX+1900+(i%5)*145,3+Math.random()*14,sfZ+650+Math.floor(i/5)*230+(i%2)*70);scene.add(hill);}
+ // Rocky bluffs and Pacific-side cliffs west of the bridge approach.
+ const sfRockMat=new THREE.MeshStandardMaterial({color:0x77766a,roughness:1,flatShading:true}),sfScrubMat=new THREE.MeshStandardMaterial({color:0x65734e,roughness:1}),sfSandMat=new THREE.MeshStandardMaterial({color:0xd3c19a,roughness:1});
+ for(let i=0;i<15;i++){const rock=new THREE.Mesh(new THREE.DodecahedronGeometry(70+Math.random()*100,1),sfRockMat);rock.scale.set(1.4,.65,1.2);rock.position.set(sfX-1500-(i%4)*95,-2+Math.random()*12,sfZ+250+(i%8)*115);scene.add(rock);}
+ for(let i=0;i<11;i++){const bluff=new THREE.Mesh(new THREE.SphereGeometry(1,10,7),sfScrubMat);bluff.scale.set(140+Math.random()*130,45+Math.random()*65,170+Math.random()*160);bluff.position.set(sfX-1250+(i%4)*100,0,sfZ+450+Math.floor(i/4)*300);scene.add(bluff);}
+ // Baker Beach and the Crissy Field shoreline: sand, tidal flats and a green coastal strip.
+ const sfBeach=new THREE.Mesh(new THREE.PlaneGeometry(720,1750),sfSandMat);sfBeach.rotation.x=-Math.PI/2;sfBeach.position.set(sfX-1740,-14.35,sfZ+300);scene.add(sfBeach);
+ const sfCrissy=new THREE.Mesh(new THREE.PlaneGeometry(650,780),new THREE.MeshStandardMaterial({color:0x8d9b69,roughness:1}));sfCrissy.rotation.x=-Math.PI/2;sfCrissy.position.set(sfX-1240,-14.38,sfZ+1030);scene.add(sfCrissy);
+ // Cypress and coastal trees along the Presidio, plus low coastal scrub.
+ const sfTrunkMat=new THREE.MeshStandardMaterial({color:0x62513c,roughness:1}),sfTreeMat=new THREE.MeshStandardMaterial({color:0x294c37,roughness:1});
+ for(let i=0;i<34;i++){const tree=new THREE.Group(),trunk=new THREE.Mesh(new THREE.CylinderGeometry(2,3,20,6),sfTrunkMat);trunk.position.y=10;tree.add(trunk);const crown=new THREE.Mesh(new THREE.ConeGeometry(9+Math.random()*5,38+Math.random()*18,7),sfTreeMat);crown.position.y=34;tree.add(crown);tree.position.set(sfX-1150+(i%8)*72,-14.2,sfZ+900+Math.floor(i/8)*65);scene.add(tree);}
+ // Alcatraz Island in the bay, with recognizable pale prison blocks and a lighthouse.
+ const sfIslandMat=new THREE.MeshStandardMaterial({color:0x858575,roughness:1}),sfIsland=new THREE.Mesh(new THREE.SphereGeometry(1,14,9),sfIslandMat);sfIsland.scale.set(145,24,250);sfIsland.position.set(sfX+1550,-8,sfZ+20);scene.add(sfIsland);
+ const sfPrison=new THREE.Mesh(new THREE.BoxGeometry(100,38,135),new THREE.MeshStandardMaterial({color:0xc4c2b4,roughness:.9}));sfPrison.position.set(sfX+1550,16,sfZ+20);scene.add(sfPrison);
+ for(let i=0;i<8;i++){const win=new THREE.Mesh(new THREE.BoxGeometry(2,3,4),new THREE.MeshStandardMaterial({color:0x44494b}));win.position.set(sfX+1497+i*15,18,sfZ-48);scene.add(win);}
+ const sfLightTower=new THREE.Mesh(new THREE.CylinderGeometry(5,7,26,8),sfConcrete);sfLightTower.position.set(sfX+1550,42,sfZ+205);scene.add(sfLightTower);
+ const sfLightTop=new THREE.Mesh(new THREE.CylinderGeometry(7,7,6,8),sfGlass);sfLightTop.position.set(sfX+1550,58,sfZ+205);scene.add(sfLightTop);
+ // Fort Point, the low brick fort beneath the southern bridge approach.
+ const sfFort=new THREE.Mesh(new THREE.BoxGeometry(95,22,80),new THREE.MeshStandardMaterial({color:0x9c7056,roughness:1}));sfFort.position.set(sfX-1000,-1,sfZ+800);scene.add(sfFort);
+ for(let i=0;i<7;i++){const embrasure=new THREE.Mesh(new THREE.BoxGeometry(5,4,3),new THREE.MeshStandardMaterial({color:0x403b36}));embrasure.position.set(sfX-1030+i*10,2,sfZ+758);scene.add(embrasure);}
+
  // Golden Gate Bridge deck, two vermilion towers and suspension cables.
  const sfBridgeZ=sfZ+950,sfBridgeY=23,sfBridgeDeck=new THREE.Mesh(new THREE.BoxGeometry(3600,5,22),new THREE.MeshStandardMaterial({color:0x8f4334,roughness:.6}));sfBridgeDeck.position.set(sfX+550,sfBridgeY,sfBridgeZ);scene.add(sfBridgeDeck);
  const sfBridgeTowers=[sfX-800,sfX+900];
