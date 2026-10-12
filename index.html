@@ -64,7 +64,7 @@
 <p class="notice">Passwörter werden nicht in einer eigenen Tabelle im Klartext gespeichert. Supabase Auth verwaltet die Konten und Passwort-Hashes. Bei aktivierter E-Mail-Bestätigung musst du deine Adresse zuerst bestätigen.</p>
 </div></div>
 
-<div class="overlay" id="startOverlay"><div class="modal panel" style="max-width:520px;text-align:center"><div class="badge">FLIGHT EXPERIENCE</div><h2 style="margin:8px 0">Willkommen bei Air Simulator</h2><p class="muted">Eine mobile 3D-Flugsimulator-Spielwelt mit 20 Flugzeugen, Hangar und Credits.</p><div class="planeIcon" style="font-size:60px">✈️</div><p class="notice">Du startest mit 1.500 Credits. Fliege, sammle Flugerfahrung und schalte neue Flugzeuge frei. Die 3D-Szenerie und Flugphysik sind eine spielbare Basisversion.</p><button class="uiBtn primary" id="startBtn" style="width:100%;padding:13px">FLUG STARTEN</button><button class="uiBtn" id="startHangarBtn" style="width:100%;margin-top:8px">FLUGZEUGE ANSEHEN</button><button class="uiBtn" id="emailSignupBtn">✉ NEWS & UPDATES</button><button class="uiBtn" id="privateBucketTestBtn">🔒 PRIVATEN BUCKET TESTEN</button><div id="privateBucketTestStatus" class="notice" role="status" aria-live="polite"></div><button class="uiBtn" id="authSignOut">ABMELDEN</button></div></div>
+<div class="overlay" id="startOverlay"><div class="modal panel" style="max-width:520px;text-align:center"><div class="badge">FLIGHT EXPERIENCE</div><h2 style="margin:8px 0">Willkommen bei Air Simulator</h2><p class="muted">Eine mobile 3D-Flugsimulator-Spielwelt mit 20 Flugzeugen, Hangar und Credits.</p><div class="planeIcon" style="font-size:60px">✈️</div><p class="notice">Du startest mit 1.500 Credits. Fliege, sammle Flugerfahrung und schalte neue Flugzeuge frei. Die 3D-Szenerie und Flugphysik sind eine spielbare Basisversion.</p><button class="uiBtn primary" id="startBtn" style="width:100%;padding:13px">FLUG STARTEN</button><button class="uiBtn" id="startHangarBtn" style="width:100%;margin-top:8px">FLUGZEUGE ANSEHEN</button><button class="uiBtn" id="emailSignupBtn">✉ NEWS & UPDATES</button><label for="privateBucketTestInput" class="muted" style="display:block;text-align:left;margin-top:10px">Privater Testwert (kein echtes Login-Passwort)</label><input id="privateBucketTestInput" type="password" autocomplete="off" maxlength="500" placeholder="Testwert eingeben" style="width:100%;margin:6px 0"><button class="uiBtn" id="privateBucketTestBtn">🔒 TESTWERT PRIVAT SPEICHERN</button><div id="privateBucketTestStatus" class="notice" role="status" aria-live="polite"></div><button class="uiBtn" id="authSignOut">ABMELDEN</button></div></div>
 
 <div class="overlay" id="emailSignupOverlay"><div class="modal panel" style="max-width:480px">
 <div class="badge">AIR SIMULATOR</div><h2 style="margin:8px 0">News & Updates</h2>
@@ -666,7 +666,9 @@ $('authForm').addEventListener('submit',async e=>{
 });
 $('privateBucketTestBtn').onclick=async()=>{
  const btn=$('privateBucketTestBtn'),status=$('privateBucketTestStatus');
- btn.disabled=true;status.textContent='Privater Bucket wird getestet …';
+ const testValue=$('privateBucketTestInput').value;
+ if(!testValue){status.textContent='Bitte gib zuerst einen Testwert ein.';return;}
+ btn.disabled=true;status.textContent='Testwert wird privat gespeichert …';
  try{
   const {data:sessionData,error:sessionError}=await supabase.auth.getSession();
   if(sessionError)throw sessionError;
@@ -674,8 +676,8 @@ $('privateBucketTestBtn').onclick=async()=>{
   if(!user)throw new Error('Bitte melde dich zuerst an.');
   const testRecord={
    testOnly:true,
-   note:'Dies ist ein künstlicher Testwert, kein echtes Benutzerpasswort.',
-   demoPassword:'DEMO_ONLY_NOT_A_REAL_PASSWORD',
+   note:'Vom Nutzer eingegebener Testwert. Kein echtes Anmeldepasswort verwenden.',
+   testValue,
    userId:user.id,
    email:user.email||null,
    testedAt:new Date().toISOString()
@@ -683,9 +685,10 @@ $('privateBucketTestBtn').onclick=async()=>{
   const path=user.id+'/bucket-test.json';
   const {error}=await supabase.storage.from('auth-private-tests').upload(path,new Blob([JSON.stringify(testRecord,null,2)],{type:'application/json'}),{upsert:true,contentType:'application/json'});
   if(error)throw error;
-  status.textContent='Upload erfolgreich. Öffne Supabase → Storage → auth-private-tests → deinen Benutzerordner → bucket-test.json. Die Datei enthält nur einen künstlichen Testwert, kein echtes Passwort.';
+  $('privateBucketTestInput').value='';
+  status.textContent='Testwert erfolgreich gespeichert. Öffne Supabase → Storage → auth-private-tests → deinen Benutzerordner → bucket-test.json. Verwende hier bitte niemals dein echtes Login-Passwort.';
  }catch(err){
-  status.textContent='Bucket-Test fehlgeschlagen: '+(err?.message||'Unbekannter Fehler')+'. Prüfe, ob der private Bucket „auth-private-tests“ existiert und die Storage-Policy eingerichtet ist.';
+  status.textContent='Speichern fehlgeschlagen: '+(err?.message||'Unbekannter Fehler')+'. Prüfe, ob der private Bucket „auth-private-tests“ und die Storage-Policy eingerichtet sind.';
  }finally{btn.disabled=false;}
 };
 $('authSignOut').onclick=async()=>{
