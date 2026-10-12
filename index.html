@@ -235,7 +235,7 @@ function addOvergrownCity(cx,cz,spreadX,spreadZ,count){
  addOvergrownCity(20,-3700,620,1120,95);
   // Move the complete New York set roughly 10 km farther away and keep collision bounds in sync.
  for(let i=nySceneStart;i<scene.children.length;i++)scene.children[i].position.z-=10000;
- for(let i=nyBoundsStart;i<cityBuildingBounds.length;i++){cityBuildingBounds[i].z-=10000;if(cityBuildingBounds[i].mesh)cityBuildingBounds[i].mesh.position.z-=10000;}
+ for(let i=nyBoundsStart;i<cityBuildingBounds.length;i++){cityBuildingBounds[i].z-=10000;}
  // LOS ANGELES: coastal basin, palm-lined boulevards, Hollywood hills and a major international airport.
  const laX=1500,laZ=-35500;
  const laLand=new THREE.Mesh(new THREE.PlaneGeometry(3400,2700),new THREE.MeshStandardMaterial({color:0xc6b58b,roughness:1}));laLand.rotation.x=-Math.PI/2;laLand.position.set(laX,-14.6,laZ);scene.add(laLand);
