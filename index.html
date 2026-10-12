@@ -86,7 +86,7 @@ try{
  const rainGeo=new THREE.BufferGeometry();rainPositions=new Float32Array(900*3);for(let i=0;i<900;i++){rainPositions[i*3]=(Math.random()-.5)*150;rainPositions[i*3+1]=Math.random()*90-25;rainPositions[i*3+2]=(Math.random()-.5)*150;}rainGeo.setAttribute('position',new THREE.BufferAttribute(rainPositions,3));const rainMat=new THREE.PointsMaterial({color:0xd8edff,size:.16,transparent:true,opacity:.7,depthWrite:false});rainPoints=new THREE.Points(rainGeo,rainMat);scene.add(rainPoints);
  const hemi=new THREE.HemisphereLight(0xd8edff,0x657b55,1.45);scene.add(hemi);const sun=new THREE.DirectionalLight(0xffffff,2.3);sun.position.set(200,400,100);scene.add(sun);
  const ground=new THREE.Mesh(new THREE.PlaneGeometry(5000,5000),new THREE.MeshStandardMaterial({color:0x5e8d54,roughness:1}));ground.rotation.x=-Math.PI/2;ground.position.y=-15;scene.add(ground);
- const ocean=new THREE.Mesh(new THREE.PlaneGeometry(5000,5000),new THREE.MeshStandardMaterial({color:0x3f9fca,roughness:.65}));ocean.rotation.x=-Math.PI/2;ocean.position.set(0,-18,-2400);scene.add(ocean);
+ const ocean=new THREE.Mesh(new THREE.PlaneGeometry(5000,18000),new THREE.MeshStandardMaterial({color:0x3f9fca,roughness:.65}));ocean.rotation.x=-Math.PI/2;ocean.position.set(0,-18,-8500);scene.add(ocean);
  // Patchwork fields and roads create a wide, lightweight landscape.
  for(let i=0;i<140;i++){let x=(Math.random()-.5)*1900,z=-Math.random()*2600-80,w=30+Math.random()*130,d=35+Math.random()*180;let m=new THREE.Mesh(new THREE.PlaneGeometry(w,d),new THREE.MeshStandardMaterial({color:[0x68985a,0x789e5d,0x587f4b,0x9aa96a][i%4],roughness:1}));m.rotation.x=-Math.PI/2;m.position.set(x,-14.7,z);scene.add(m)}
  const runway=new THREE.Mesh(new THREE.PlaneGeometry(65,1300),new THREE.MeshStandardMaterial({color:0x353d45,roughness:1}));runway.rotation.x=-Math.PI/2;runway.position.set(0,-14.3,-180);scene.add(runway);
@@ -127,6 +127,7 @@ try{
  }
  remoteRunway(-350,-1150,300,38);remoteRunway(480,-1250,360,42);remoteRunway(-1050,-1350,260,34);
  // NEW YORK: an island skyline appears after the long ocean crossing.
+ const nySceneStart=scene.children.length,nyBoundsStart=cityBuildingBounds.length;
  const nyIsland=new THREE.Mesh(new THREE.PlaneGeometry(1450,1900),new THREE.MeshStandardMaterial({color:0x777d72,roughness:1}));
  nyIsland.rotation.x=-Math.PI/2;nyIsland.position.set(40,-14.62,-3700);scene.add(nyIsland);
  const nyRoadMat=new THREE.MeshStandardMaterial({color:0x343b42,roughness:1}),nyParkMat=new THREE.MeshStandardMaterial({color:0x46734c,roughness:1});
@@ -165,6 +166,9 @@ try{
  const flame=new THREE.Mesh(new THREE.SphereGeometry(3,8,7),new THREE.MeshStandardMaterial({color:0xffc75c,emissive:0xb96812,emissiveIntensity:.55}));flame.scale.set(.65,1.6,.65);flame.position.set(-325,91,-3490);scene.add(flame);
  const book=new THREE.Mesh(new THREE.BoxGeometry(5,7,2),patinaLight);book.position.set(-354,48,-3485);scene.add(book);
  for(const z of [-3070,-3330,-3890,-4240]){const dock=new THREE.Mesh(new THREE.BoxGeometry(120,2,18),new THREE.MeshStandardMaterial({color:0x8d887c,roughness:1}));dock.position.set(-320,-13.2,z);scene.add(dock);}
+ // Move the complete New York set roughly 10 km farther away and keep collision bounds in sync.
+ for(let i=nySceneStart;i<scene.children.length;i++)scene.children[i].position.z-=10000;
+ for(let i=nyBoundsStart;i<cityBuildingBounds.length;i++){cityBuildingBounds[i].z-=10000;if(cityBuildingBounds[i].mesh)cityBuildingBounds[i].mesh.position.z-=10000;}
  // Mountain range with narrow flyable valleys between tall rock peaks.
  const rockMats=[0x777b80,0x626b73,0x8b8e91,0x59636c].map(c=>new THREE.MeshStandardMaterial({color:c,roughness:1,flatShading:true}));
  const peaks=[[850,-470,115,220],[1030,-610,105,250],[1240,-480,120,270],[1450,-620,115,235],[1660,-470,125,285],[1850,-650,120,250],[900,-780,130,250],[1110,-900,120,290],[1320,-1040,130,310],[1540,-930,125,280],[1760,-1080,135,320],[1940,-900,120,260],[880,-1190,120,245],[1080,-1360,130,300],[1300,-1510,125,290],[1510,-1630,140,330],[1740,-1510,130,310],[1920,-1330,120,280],[1040,-1730,120,260],[1260,-1850,135,300],[1500,-1900,130,280],[1740,-1810,140,320]];
