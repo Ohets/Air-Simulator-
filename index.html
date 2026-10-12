@@ -126,6 +126,45 @@ try{
    apron.rotation.x=-Math.PI/2;apron.position.set(x,-14.3,z-length/2-22);scene.add(apron);
  }
  remoteRunway(-350,-1150,300,38);remoteRunway(480,-1250,360,42);remoteRunway(-1050,-1350,260,34);
+ // NEW YORK: an island skyline appears after the long ocean crossing.
+ const nyIsland=new THREE.Mesh(new THREE.PlaneGeometry(1450,1900),new THREE.MeshStandardMaterial({color:0x777d72,roughness:1}));
+ nyIsland.rotation.x=-Math.PI/2;nyIsland.position.set(40,-14.62,-3700);scene.add(nyIsland);
+ const nyRoadMat=new THREE.MeshStandardMaterial({color:0x343b42,roughness:1}),nyParkMat=new THREE.MeshStandardMaterial({color:0x46734c,roughness:1});
+ for(let x=-240;x<=260;x+=72){const road=new THREE.Mesh(new THREE.PlaneGeometry(12,1500),nyRoadMat);road.rotation.x=-Math.PI/2;road.position.set(x,-14.48,-3700);scene.add(road);}
+ for(let z=-3000;z>=-4400;z-=95){const road=new THREE.Mesh(new THREE.PlaneGeometry(650,11),nyRoadMat);road.rotation.x=-Math.PI/2;road.position.set(15,-14.47,z);scene.add(road);}
+ for(const [x,z,w,d] of [[-210,-3260,55,130],[-170,-3900,70,150],[190,-4150,65,130],[260,-3330,45,110],[-300,-4100,65,120]]){const park=new THREE.Mesh(new THREE.PlaneGeometry(w,d),nyParkMat);park.rotation.x=-Math.PI/2;park.position.set(x,-14.45,z);scene.add(park);}
+ const nyColors=[0x9aa5ad,0xb6b2a6,0x6e8292,0x8a989e,0x747a83,0xc0b9a8];
+ const nyGlass=new THREE.MeshStandardMaterial({color:0x31556d,roughness:.28,metalness:.35});
+ for(let ix=0;ix<9;ix++)for(let iz=0;iz<14;iz++){
+   const x=-220+ix*52+(Math.random()-.5)*15,z=-3000-iz*98+(Math.random()-.5)*24;
+   if(Math.abs(x+10)<48&&iz>4&&iz<10)continue;
+   const w=25+Math.random()*19,d=28+Math.random()*27,h=45+Math.random()*175;
+   building(x,-14.5+h/2,z,w,h,d,nyColors[(ix*3+iz)%nyColors.length]);
+   if(Math.random()>.28){const crown=new THREE.Mesh(new THREE.BoxGeometry(w*.68,3,d*.68),nyGlass);crown.position.set(x,-14.5+h+1.5,z);scene.add(crown);}
+   if(Math.random()>.55){const spire=new THREE.Mesh(new THREE.CylinderGeometry(.5,.9,10+Math.random()*24,6),nyGlass);spire.position.set(x,-14.5+h+8,z);scene.add(spire);}
+ }
+ for(let ix=0;ix<5;ix++)for(let iz=0;iz<9;iz++){const x=360+ix*48,z=-3190-iz*105,w=27+Math.random()*16,d=35+Math.random()*20,h=18+Math.random()*55;building(x,-14.5+h/2,z,w,h,d,[0x9b9a91,0x8b969b,0xb5aa98,0x777f83][(ix+iz)%4]);}
+ // Brooklyn Bridge, stone towers and suspension cables.
+ const bridgeDeck=new THREE.Mesh(new THREE.BoxGeometry(410,3,30),new THREE.MeshStandardMaterial({color:0x7c7770,roughness:.9}));bridgeDeck.position.set(285,-7,-3610);scene.add(bridgeDeck);
+ const bridgeStone=new THREE.MeshStandardMaterial({color:0xb9ad98,roughness:1}),bridgeCable=new THREE.MeshStandardMaterial({color:0x454b50,metalness:.55,roughness:.5});
+ for(const x of [170,400])for(const z of [-3620,-3600]){const tower=new THREE.Mesh(new THREE.BoxGeometry(13,90,10),bridgeStone);tower.position.set(x,30,z);scene.add(tower);const arch=new THREE.Mesh(new THREE.BoxGeometry(15,17,12),bridgeStone);arch.position.set(x,13,z);scene.add(arch);}
+ function nyCable(points,r=.7){const curve=new THREE.CatmullRomCurve3(points.map(p=>new THREE.Vector3(p[0],p[1],p[2])));scene.add(new THREE.Mesh(new THREE.TubeGeometry(curve,36,r,5,false),bridgeCable));}
+ for(const z of [-3620,-3600]){nyCable([[70,30,z],[170,70,z],[285,76,z],[400,70,z],[500,30,z]],.75);nyCable([[70,10,z],[170,62,z],[285,66,z],[400,62,z],[500,10,z]],.5);}
+ for(let x=90;x<490;x+=18){const hanger=new THREE.Mesh(new THREE.CylinderGeometry(.28,.28,22,5),bridgeCable);hanger.position.set(x,7,-3610);scene.add(hanger);}
+ // Statue of Liberty: island, stone pedestal, green figure, crown and torch.
+ const statueBase=new THREE.Mesh(new THREE.CylinderGeometry(43,52,7,8),new THREE.MeshStandardMaterial({color:0x686e70,roughness:1}));statueBase.position.set(-345,-11,-3490);scene.add(statueBase);
+ const statuePed=new THREE.Mesh(new THREE.BoxGeometry(42,40,42),new THREE.MeshStandardMaterial({color:0x9c8b76,roughness:1}));statuePed.position.set(-345,9,-3490);scene.add(statuePed);
+ const patina=new THREE.MeshStandardMaterial({color:0x4b9b83,roughness:.72,metalness:.18}),patinaLight=new THREE.MeshStandardMaterial({color:0x69b49a,roughness:.7,metalness:.12});
+ const robe=new THREE.Mesh(new THREE.CylinderGeometry(7,13,31,9),patina);robe.position.set(-345,44,-3490);scene.add(robe);
+ const shoulders=new THREE.Mesh(new THREE.SphereGeometry(8,10,8),patina);shoulders.scale.set(1,.7,.8);shoulders.position.set(-345,59,-3490);scene.add(shoulders);
+ const head=new THREE.Mesh(new THREE.SphereGeometry(4.6,10,8),patinaLight);head.position.set(-345,68,-3490);scene.add(head);
+ const crown=new THREE.Mesh(new THREE.ConeGeometry(6,8,7),patina);crown.position.set(-345,76,-3490);scene.add(crown);
+ const arm=new THREE.Mesh(new THREE.CylinderGeometry(2.3,3,22,7),patina);arm.position.set(-333,68,-3490);arm.rotation.z=-.48;scene.add(arm);
+ const torchArm=new THREE.Mesh(new THREE.CylinderGeometry(1.8,2.2,17,7),patina);torchArm.position.set(-326,77,-3490);torchArm.rotation.z=-.16;scene.add(torchArm);
+ const torch=new THREE.Mesh(new THREE.CylinderGeometry(2.6,1.8,5,8),patinaLight);torch.position.set(-325,86,-3490);scene.add(torch);
+ const flame=new THREE.Mesh(new THREE.SphereGeometry(3,8,7),new THREE.MeshStandardMaterial({color:0xffc75c,emissive:0xb96812,emissiveIntensity:.55}));flame.scale.set(.65,1.6,.65);flame.position.set(-325,91,-3490);scene.add(flame);
+ const book=new THREE.Mesh(new THREE.BoxGeometry(5,7,2),patinaLight);book.position.set(-354,48,-3485);scene.add(book);
+ for(const z of [-3070,-3330,-3890,-4240]){const dock=new THREE.Mesh(new THREE.BoxGeometry(120,2,18),new THREE.MeshStandardMaterial({color:0x8d887c,roughness:1}));dock.position.set(-320,-13.2,z);scene.add(dock);}
  // Mountain range with narrow flyable valleys between tall rock peaks.
  const rockMats=[0x777b80,0x626b73,0x8b8e91,0x59636c].map(c=>new THREE.MeshStandardMaterial({color:c,roughness:1,flatShading:true}));
  const peaks=[[850,-470,115,220],[1030,-610,105,250],[1240,-480,120,270],[1450,-620,115,235],[1660,-470,125,285],[1850,-650,120,250],[900,-780,130,250],[1110,-900,120,290],[1320,-1040,130,310],[1540,-930,125,280],[1760,-1080,135,320],[1940,-900,120,260],[880,-1190,120,245],[1080,-1360,130,300],[1300,-1510,125,290],[1510,-1630,140,330],[1740,-1510,130,310],[1920,-1330,120,280],[1040,-1730,120,260],[1260,-1850,135,300],[1500,-1900,130,280],[1740,-1810,140,320]];
