@@ -86,7 +86,7 @@ try{
  const rainGeo=new THREE.BufferGeometry();rainPositions=new Float32Array(900*3);for(let i=0;i<900;i++){rainPositions[i*3]=(Math.random()-.5)*150;rainPositions[i*3+1]=Math.random()*90-25;rainPositions[i*3+2]=(Math.random()-.5)*150;}rainGeo.setAttribute('position',new THREE.BufferAttribute(rainPositions,3));const rainMat=new THREE.PointsMaterial({color:0xd8edff,size:.16,transparent:true,opacity:.7,depthWrite:false});rainPoints=new THREE.Points(rainGeo,rainMat);scene.add(rainPoints);
  const hemi=new THREE.HemisphereLight(0xd8edff,0x657b55,1.45);scene.add(hemi);const sun=new THREE.DirectionalLight(0xffffff,2.3);sun.position.set(200,400,100);scene.add(sun);
  const ground=new THREE.Mesh(new THREE.PlaneGeometry(5000,5000),new THREE.MeshStandardMaterial({color:0x5e8d54,roughness:1}));ground.rotation.x=-Math.PI/2;ground.position.y=-15;scene.add(ground);
- const ocean=new THREE.Mesh(new THREE.PlaneGeometry(5000,18000),new THREE.MeshStandardMaterial({color:0x3f9fca,roughness:.65}));ocean.rotation.x=-Math.PI/2;ocean.position.set(0,-18,-8500);scene.add(ocean);
+ const ocean=new THREE.Mesh(new THREE.PlaneGeometry(7000,40000),new THREE.MeshStandardMaterial({color:0x3f9fca,roughness:.65}));ocean.rotation.x=-Math.PI/2;ocean.position.set(0,-18,-19000);scene.add(ocean);
  // Patchwork fields and roads create a wide, lightweight landscape.
  for(let i=0;i<140;i++){let x=(Math.random()-.5)*1900,z=-Math.random()*2600-80,w=30+Math.random()*130,d=35+Math.random()*180;let m=new THREE.Mesh(new THREE.PlaneGeometry(w,d),new THREE.MeshStandardMaterial({color:[0x68985a,0x789e5d,0x587f4b,0x9aa96a][i%4],roughness:1}));m.rotation.x=-Math.PI/2;m.position.set(x,-14.7,z);scene.add(m)}
  const runway=new THREE.Mesh(new THREE.PlaneGeometry(65,1300),new THREE.MeshStandardMaterial({color:0x353d45,roughness:1}));runway.rotation.x=-Math.PI/2;runway.position.set(0,-14.3,-180);scene.add(runway);
@@ -188,6 +188,38 @@ try{
  // Move the complete New York set roughly 10 km farther away and keep collision bounds in sync.
  for(let i=nySceneStart;i<scene.children.length;i++)scene.children[i].position.z-=10000;
  for(let i=nyBoundsStart;i<cityBuildingBounds.length;i++){cityBuildingBounds[i].z-=10000;if(cityBuildingBounds[i].mesh)cityBuildingBounds[i].mesh.position.z-=10000;}
+ // LOS ANGELES: coastal basin, palm-lined boulevards, Hollywood hills and a major international airport.
+ const laX=1500,laZ=-35500;
+ const laLand=new THREE.Mesh(new THREE.PlaneGeometry(3400,2700),new THREE.MeshStandardMaterial({color:0xc6b58b,roughness:1}));laLand.rotation.x=-Math.PI/2;laLand.position.set(laX,-14.6,laZ);scene.add(laLand);
+ const laOcean=new THREE.Mesh(new THREE.PlaneGeometry(1100,2700),new THREE.MeshStandardMaterial({color:0x2e8fbd,roughness:.55}));laOcean.rotation.x=-Math.PI/2;laOcean.position.set(laX-2150,-17.6,laZ);scene.add(laOcean);
+ const laBeach=new THREE.Mesh(new THREE.PlaneGeometry(150,2500),new THREE.MeshStandardMaterial({color:0xe5d19d,roughness:1}));laBeach.rotation.x=-Math.PI/2;laBeach.position.set(laX-1550,-14.45,laZ);scene.add(laBeach);
+ const laRoad=new THREE.MeshStandardMaterial({color:0x42474a,roughness:1}),laRoadLine=new THREE.MeshStandardMaterial({color:0xf2d36a,roughness:1}),laConcrete=new THREE.MeshStandardMaterial({color:0x999b98,roughness:1}),laGlass=new THREE.MeshStandardMaterial({color:0x5b8295,metalness:.25,roughness:.35});
+ // A broad Los Angeles street grid with long avenues and smaller blocks.
+ for(let x=laX-1250;x<=laX+1250;x+=125){const road=new THREE.Mesh(new THREE.PlaneGeometry(15,2350),laRoad);road.rotation.x=-Math.PI/2;road.position.set(x,-14.48,laZ);scene.add(road);const line=new THREE.Mesh(new THREE.PlaneGeometry(1,2350),laRoadLine);line.rotation.x=-Math.PI/2;line.position.set(x,-14.44,laZ);scene.add(line);}
+ for(let z=laZ-1050;z<=laZ+1050;z+=115){const road=new THREE.Mesh(new THREE.PlaneGeometry(2650,14),laRoad);road.rotation.x=-Math.PI/2;road.position.set(laX,-14.47,z);scene.add(road);}
+ const laBuildingColors=[0xb8aa91,0x8e9898,0x697d89,0xc9c0ad,0x7c8588,0xd0c4a8];
+ for(let ix=0;ix<18;ix++)for(let iz=0;iz<17;iz++){
+   const x=laX-1050+ix*125+(Math.random()-.5)*28,z=laZ-980+iz*120+(Math.random()-.5)*25;
+   const downtown=Math.abs(x-laX)<360&&Math.abs(z-laZ)<470;
+   const w=35+Math.random()*48,d=35+Math.random()*48,h=downtown?45+Math.random()*220:12+Math.random()*45;
+   const mat=Math.random()>.72?laGlass:new THREE.MeshStandardMaterial({color:laBuildingColors[(ix*7+iz*3)%laBuildingColors.length],roughness:.85});
+   const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);b.position.set(x,-14.5+h/2,z);scene.add(b);
+   if(downtown&&h>130){const crown=new THREE.Mesh(new THREE.BoxGeometry(w*.5,5,d*.5),laGlass);crown.position.set(x,-14.5+h+2.5,z);scene.add(crown);}
+ }
+ // Hollywood-style low hills and the iconic hillside sign.
+ for(let i=0;i<7;i++){const hill=new THREE.Mesh(new THREE.SphereGeometry(1,9,7),new THREE.MeshStandardMaterial({color:[0x827c58,0x938761,0x777c55][i%3],roughness:1}));hill.scale.set(170+Math.random()*110,65+Math.random()*55,100+Math.random()*65);hill.position.set(laX+400+i*105,8,laZ-1250-(i%3)*85);scene.add(hill);}
+ for(let i=0;i<9;i++){const letter=new THREE.Mesh(new THREE.BoxGeometry(17,27,4),new THREE.MeshStandardMaterial({color:0xf1eee3,roughness:1}));letter.position.set(laX+260+i*23,52,laZ-1260);scene.add(letter);}
+ // Palm trees along the beach boulevard.
+ const palmTrunk=new THREE.MeshStandardMaterial({color:0x806247,roughness:1}),palmLeaf=new THREE.MeshStandardMaterial({color:0x36734b,roughness:1});
+ for(let z=laZ-1100;z<=laZ+1100;z+=95)for(const x of [laX-1400,laX-1270]){const trunk=new THREE.Mesh(new THREE.CylinderGeometry(2,3,28,6),palmTrunk);trunk.position.set(x,0,z);scene.add(trunk);for(let a=0;a<6;a++){const leaf=new THREE.Mesh(new THREE.ConeGeometry(3,23,5),palmLeaf);leaf.position.set(x+Math.cos(a*Math.PI/3)*8,15,z+Math.sin(a*Math.PI/3)*8);leaf.rotation.z=Math.cos(a*Math.PI/3)*.9;leaf.rotation.x=Math.sin(a*Math.PI/3)*.8;scene.add(leaf);}}
+ // Los Angeles International Airport-inspired complex to the south of the skyline.
+ const laxX=laX+700,laxZ=laZ+780,laxAsphalt=new THREE.MeshStandardMaterial({color:0x363c41,roughness:1}),laxWhite=new THREE.MeshStandardMaterial({color:0xf0f0e7,roughness:1}),laxYellow=new THREE.MeshStandardMaterial({color:0xf3c84b,roughness:1});
+ for(const [rx,rz,len,width] of [[laxX-260,laxZ,920,72],[laxX+260,laxZ,920,72],[laxX,laxZ+230,820,68]]){const runway=new THREE.Mesh(new THREE.PlaneGeometry(width,len),laxAsphalt);runway.rotation.x=-Math.PI/2;runway.position.set(rx,-14.36,rz);scene.add(runway);for(let z=rz-len/2+35;z<rz+len/2-20;z+=43){const dash=new THREE.Mesh(new THREE.PlaneGeometry(2,19),laxWhite);dash.rotation.x=-Math.PI/2;dash.position.set(rx,-14.25,z);scene.add(dash);}for(const x of [rx-width/2-4,rx+width/2+4])for(let z=rz-len/2;z<=rz+len/2;z+=48){const light=new THREE.Mesh(new THREE.SphereGeometry(1.1,5,4),new THREE.MeshBasicMaterial({color:0x69cfff}));light.position.set(x,-13.25,z);scene.add(light);}}
+ const laxApron=new THREE.Mesh(new THREE.PlaneGeometry(450,300),laConcrete);laxApron.rotation.x=-Math.PI/2;laxApron.position.set(laxX,-14.32,laxZ-360);scene.add(laxApron);
+ for(let i=0;i<5;i++){const terminal=new THREE.Mesh(new THREE.BoxGeometry(65,17,35),laGlass);terminal.position.set(laxX-170+i*85,-6,laxZ-440);scene.add(terminal);const roof=new THREE.Mesh(new THREE.BoxGeometry(70,3,39),laConcrete);roof.position.set(laxX-170+i*85,4,laxZ-440);scene.add(roof);}
+ const laxTower=new THREE.Mesh(new THREE.BoxGeometry(14,32,14),laConcrete);laxTower.position.set(laxX+275,1,laxZ-420);scene.add(laxTower);const laxCabin=new THREE.Mesh(new THREE.BoxGeometry(25,10,25),laGlass);laxCabin.position.set(laxX+275,22,laxZ-420);scene.add(laxCabin);
+ // Move the whole Los Angeles region another 25 km beyond New York, keeping it on the extended ocean route.
+ for(let i=0;i<scene.children.length;i++){const o=scene.children[i];if(o.userData.losAngelesPart)o.position.z-=0;}
  // Mountain range with narrow flyable valleys between tall rock peaks.
  const rockMats=[0x777b80,0x626b73,0x8b8e91,0x59636c].map(c=>new THREE.MeshStandardMaterial({color:c,roughness:1,flatShading:true}));
  const peaks=[[850,-470,115,220],[1030,-610,105,250],[1240,-480,120,270],[1450,-620,115,235],[1660,-470,125,285],[1850,-650,120,250],[900,-780,130,250],[1110,-900,120,290],[1320,-1040,130,310],[1540,-930,125,280],[1760,-1080,135,320],[1940,-900,120,260],[880,-1190,120,245],[1080,-1360,130,300],[1300,-1510,125,290],[1510,-1630,140,330],[1740,-1510,130,310],[1920,-1330,120,280],[1040,-1730,120,260],[1260,-1850,135,300],[1500,-1900,130,280],[1740,-1810,140,320]];
