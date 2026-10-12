@@ -127,7 +127,25 @@ try{
    apron.rotation.x=-Math.PI/2;apron.position.set(x,-14.3,z-length/2-22);scene.add(apron);
  }
  remoteRunway(-350,-1150,300,38);remoteRunway(480,-1250,360,42);remoteRunway(-1050,-1350,260,34);
- // NEW YORK: an island skyline appears after the long ocean crossing.
+ 
+// ABANDONED-CITY OVERGROWTH: trees, vines and shrubs reclaim streets and rooftops.
+function addOvergrownCity(cx,cz,spreadX,spreadZ,count){
+  const trunkMat=new THREE.MeshStandardMaterial({color:0x514234,roughness:1});
+  const leafMats=[0x244b2b,0x315c32,0x3d6b37,0x527a3c,0x1d4027].map(color=>new THREE.MeshStandardMaterial({color,roughness:1}));
+  const vineMat=new THREE.MeshStandardMaterial({color:0x315c32,roughness:1});
+  for(let i=0;i<count;i++){
+    const x=cx+(Math.random()-.5)*spreadX,z=cz+(Math.random()-.5)*spreadZ,h=10+Math.random()*23,r=2.4+Math.random()*4.5;
+    const tree=new THREE.Group(),trunk=new THREE.Mesh(new THREE.CylinderGeometry(r*.45,r,h,6),trunkMat);trunk.position.y=h/2;tree.add(trunk);
+    for(let j=0;j<4;j++){const crown=new THREE.Mesh(new THREE.SphereGeometry(r*(1.25+Math.random()*.65),7,6),leafMats[Math.floor(Math.random()*leafMats.length)]);crown.position.set((Math.random()-.5)*r*1.8,h*.58+Math.random()*h*.45,(Math.random()-.5)*r*1.8);crown.scale.y=.85+Math.random()*.8;tree.add(crown);}
+    tree.position.set(x,-14.5,z);scene.add(tree);
+    if(i%3===0){const bush=new THREE.Mesh(new THREE.SphereGeometry(5+Math.random()*7,7,5),leafMats[i%leafMats.length]);bush.scale.y=.55;bush.position.set(x+12,-11.7,z-8);scene.add(bush);}
+    if(i%5===0){const vine=new THREE.Mesh(new THREE.CylinderGeometry(.35,.65,8+Math.random()*13,5),vineMat);vine.position.set(x+5,-4,z+5);vine.rotation.z=(Math.random()-.5)*.7;scene.add(vine);}
+  }
+  const grassMat=new THREE.MeshStandardMaterial({color:0x426a35,roughness:1});
+  for(let i=0;i<Math.floor(count/5);i++){const patch=new THREE.Mesh(new THREE.PlaneGeometry(10+Math.random()*24,14+Math.random()*30),grassMat);patch.rotation.x=-Math.PI/2;patch.position.set(cx+(Math.random()-.5)*spreadX,-14.43,cz+(Math.random()-.5)*spreadZ);scene.add(patch);}
+}
+
+// NEW YORK: an island skyline appears after the long ocean crossing.
  const nySceneStart=scene.children.length,nyBoundsStart=cityBuildingBounds.length;
  const nyIsland=new THREE.Mesh(new THREE.PlaneGeometry(1450,1900),new THREE.MeshStandardMaterial({color:0x777d72,roughness:1}));
  nyIsland.rotation.x=-Math.PI/2;nyIsland.position.set(40,-14.62,-3700);scene.add(nyIsland);
@@ -186,7 +204,8 @@ try{
  for(const [x,z] of [[airportX+80,airportZ-285],[airportX+135,airportZ-300]]){const airportHangar=new THREE.Mesh(new THREE.BoxGeometry(38,18,30),airportConcrete);airportHangar.position.set(x,-5.3,z);scene.add(airportHangar);const airportHangarRoof=new THREE.Mesh(new THREE.ConeGeometry(25,9,4),airportRoof);airportHangarRoof.rotation.y=Math.PI/4;airportHangarRoof.scale.set(1,.45,.7);airportHangarRoof.position.set(x,8,z);scene.add(airportHangarRoof);}
  for(const x of [airportX-42,airportX+42])for(let z=airportZ-320;z<=airportZ+320;z+=32){const airportLight=new THREE.Mesh(new THREE.SphereGeometry(1.15,6,5),new THREE.MeshBasicMaterial({color:0x62c7ff}));airportLight.position.set(x,-13.3,z);scene.add(airportLight);}
  for(let n=1;n<=5;n++){const airportApproachLight=new THREE.Mesh(new THREE.SphereGeometry(1.7,6,5),new THREE.MeshBasicMaterial({color:n%2?0xff554f:0xffffff}));airportApproachLight.position.set(airportX,-13.1,airportZ-345-n*13);scene.add(airportApproachLight);}
- // Move the complete New York set roughly 10 km farther away and keep collision bounds in sync.
+ addOvergrownCity(20,-3700,620,1120,95);
+  // Move the complete New York set roughly 10 km farther away and keep collision bounds in sync.
  for(let i=nySceneStart;i<scene.children.length;i++)scene.children[i].position.z-=10000;
  for(let i=nyBoundsStart;i<cityBuildingBounds.length;i++){cityBuildingBounds[i].z-=10000;if(cityBuildingBounds[i].mesh)cityBuildingBounds[i].mesh.position.z-=10000;}
  // LOS ANGELES: coastal basin, palm-lined boulevards, Hollywood hills and a major international airport.
@@ -219,7 +238,8 @@ try{
  const laxApron=new THREE.Mesh(new THREE.PlaneGeometry(450,300),laConcrete);laxApron.rotation.x=-Math.PI/2;laxApron.position.set(laxX,-14.32,laxZ-360);scene.add(laxApron);
  for(let i=0;i<5;i++){const terminal=new THREE.Mesh(new THREE.BoxGeometry(65,17,35),laGlass);terminal.position.set(laxX-170+i*85,-6,laxZ-440);scene.add(terminal);const roof=new THREE.Mesh(new THREE.BoxGeometry(70,3,39),laConcrete);roof.position.set(laxX-170+i*85,4,laxZ-440);scene.add(roof);}
  const laxTower=new THREE.Mesh(new THREE.BoxGeometry(14,32,14),laConcrete);laxTower.position.set(laxX+275,1,laxZ-420);scene.add(laxTower);const laxCabin=new THREE.Mesh(new THREE.BoxGeometry(25,10,25),laGlass);laxCabin.position.set(laxX+275,22,laxZ-420);scene.add(laxCabin);
- // Move the whole Los Angeles region another 25 km beyond New York, keeping it on the extended ocean route.
+ addOvergrownCity(laX,laZ-80,2100,1850,150);
+  // Move the whole Los Angeles region another 25 km beyond New York, keeping it on the extended ocean route.
  for(let i=0;i<scene.children.length;i++){const o=scene.children[i];if(o.userData.losAngelesPart)o.position.z-=0;}
 
  // SAN FRANCISCO: bayfront skyline, hills, Golden Gate Bridge and an international airport.
@@ -273,6 +293,7 @@ try{
  const sfoApron=new THREE.Mesh(new THREE.PlaneGeometry(430,260),sfConcrete);sfoApron.rotation.x=-Math.PI/2;sfoApron.position.set(sfoX,-14.3,sfoZ-340);scene.add(sfoApron);
  for(let i=0;i<5;i++){const t=new THREE.Mesh(new THREE.BoxGeometry(62,17,36),sfGlass);t.position.set(sfoX-165+i*82,-6,sfoZ-405);scene.add(t);const roof=new THREE.Mesh(new THREE.BoxGeometry(68,3,40),sfConcrete);roof.position.set(sfoX-165+i*82,4,sfoZ-405);scene.add(roof);}
  const sfoTower=new THREE.Mesh(new THREE.BoxGeometry(13,36,13),sfConcrete);sfoTower.position.set(sfoX+280,3,sfoZ-400);scene.add(sfoTower);const sfoCabin=new THREE.Mesh(new THREE.BoxGeometry(24,9,24),sfGlass);sfoCabin.position.set(sfoX+280,25,sfoZ-400);scene.add(sfoCabin);
+  addOvergrownCity(sfX-1050,sfZ+10,2050,2050,145);
 
  // Mountain range with narrow flyable valleys between tall rock peaks.
  const rockMats=[0x777b80,0x626b73,0x8b8e91,0x59636c].map(c=>new THREE.MeshStandardMaterial({color:c,roughness:1,flatShading:true}));
