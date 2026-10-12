@@ -19,7 +19,7 @@
   <div><div class="brand">AIR <span>SIMULATOR</span></div><div class="stat" id="planeName">Cessna 172 · Trainer</div></div>
   <div class="rightStats"><div class="stat">GESCHWINDIGKEIT<strong><span id="speed">0</span> <small>km/h</small></strong></div><div class="stat">HÖHE<strong><span id="altitude">120</span> <small>m</small></strong></div><div class="stat">CREDITS<strong>✦ <span id="credits">1500</span></strong></div></div>
  </div>
- <div class="actions"><button class="uiBtn" id="hangarBtn">✈ HANGAR</button><button class="uiBtn" id="missionsBtn">🎯 MISSIONEN</button><button class="uiBtn" id="viewBtn">KAMERA: FOLLOW</button><button class="uiBtn" id="autopilotBtn">AUTOPILOT: AUS</button><button class="uiBtn" id="autoLandBtn">AUTO-LANDUNG: AUS</button><button class="uiBtn" id="gyroBtn">GYRO: AUS</button><button class="uiBtn" id="pauseBtn">Ⅱ PAUSE</button></div>
+ <div class="actions"><button class="uiBtn" id="hangarBtn">✈ HANGAR</button><button class="uiBtn" id="missionsBtn">🎯 MISSIONEN</button><button class="uiBtn" id="flightNYBtn">✈ FLIGHT TO NY</button><button class="uiBtn" id="flightLABtn">🌴 FLIGHT TO LA</button><button class="uiBtn" id="viewBtn">KAMERA: FOLLOW</button><button class="uiBtn" id="autopilotBtn">AUTOPILOT: AUS</button><button class="uiBtn" id="autoLandBtn">AUTO-LANDUNG: AUS</button><button class="uiBtn" id="gyroBtn">GYRO: AUS</button><button class="uiBtn" id="pauseBtn">Ⅱ PAUSE</button></div>
  <div class="crosshair"></div>
  <div class="bottomInfo panel"><b id="status">BEREIT ZUM FLUG</b><br>Joystick / Gyro: Nicken & Rollen<br>Gas rechts · Kamera wechseln</div>
  <div class="flightControls">
@@ -78,6 +78,7 @@ function finishMission(i){if(i<0||completedMissions.has(i))return;const m=missio
 function save(){try{localStorage.setItem('airSimSave',JSON.stringify({credits,owned:[...owned],current,completedMissions:[...completedMissions]}))}catch{}}
 function ui(){ $('credits').textContent=credits.toLocaleString('de-AT');$('hangarCredits').textContent=credits.toLocaleString('de-AT');$('planeName').textContent=planes[current].name+' · '+planes[current].type;$('speed').textContent=Math.round(Math.max(0,speed*3.6));$('altitude').textContent=Math.max(0,Math.round(120+altitude));$('throttleVal').textContent=throttle+'%';}
 let scene,camera,renderer,planeGroup,clock=new THREE.Clock(),speed=0,altitude=0,throttle=35,paused=false,gear=true,view=0,steerX=0,steerY=0,heading=0,autopilotEnabled=false,autopilotHeading=0,autopilotAltitude=120,autoLandingEnabled=false,flightTime=0,gyroEnabled=false,gyroZeroBeta=null,gyroZeroGamma=null,gyroX=0,gyroY=0,rollAngle=0,pitchAngle=0,yawRate=0,stalling=false,rainPoints=null,rainPositions=null,audioCtx=null,engineOsc=null,engineGain=null,rainGain=null,rainFilter=null,rainNoiseSource=null;
+let flightRouteTarget=null,flightRouteName='';
 try{
  scene=new THREE.Scene();scene.background=new THREE.Color(0x8cccf5);scene.fog=new THREE.Fog(0x8cccf5,450,2300);
  camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,4000);
@@ -273,9 +274,9 @@ function render(t){
   else $('status').style.color='';
   // Umgekehrte Links-rechts-Steuerung: Joystick nach rechts lässt das Flugzeug nach links fliegen.
   const landingHeading=planeGroup.position.z < -800 ? Math.PI : (planeGroup.position.z > 420 ? Math.atan2(planeGroup.position.x,planeGroup.position.z-420) : Math.max(-.5,Math.min(.5,planeGroup.position.x*.004)));
-  const selectedHeading=autoLandingEnabled?landingHeading:autopilotHeading;
+  const selectedHeading=flightRouteTarget?Math.atan2(-(flightRouteTarget.x-planeGroup.position.x),-(flightRouteTarget.z-planeGroup.position.z)):(autoLandingEnabled?landingHeading:autopilotHeading);
   const headingError=Math.atan2(Math.sin(selectedHeading-heading),Math.cos(selectedHeading-heading));
-  const inputX=(autoLandingEnabled||autopilotEnabled)?Math.max(-.55,Math.min(.55,headingError*1.15)):-(gyroEnabled?-gyroX:steerX);
+  const inputX=(flightRouteTarget||autoLandingEnabled||autopilotEnabled)?Math.max(-.55,Math.min(.55,headingError*(flightRouteTarget?2.0:1.15))):-(gyroEnabled?-gyroX:steerX);
   const inputY=(autoLandingEnabled||autopilotEnabled)?0:-(gyroEnabled?-gyroY:steerY);
   const targetRoll=inputX*.72;
   // Umgekehrte Hoch-runter-Steuerung: Joystick nach unten senkt die Nase,
@@ -297,6 +298,7 @@ function render(t){
   // Die Flugbahn folgt der tatsächlichen Flugzeugnase statt nur dem Kamera-/Heading-Winkel.
   // Dadurch beeinflussen Nicken und Rollen die Bewegungsrichtung direkt.
   const forward=new THREE.Vector3(0,0,-1).applyQuaternion(planeGroup.quaternion).normalize();
+  if(flightRouteTarget){const routeDistance=Math.hypot(flightRouteTarget.x-planeGroup.position.x,flightRouteTarget.z-planeGroup.position.z);if(routeDistance<260){flightRouteTarget=null;autopilotEnabled=false;$('autopilotBtn').textContent='AUTOPILOT: AUS';$('status').textContent='ANGEKOMMEN: '+flightRouteName.toUpperCase()+' · MANUELLE STEUERUNG';flightRouteName='';}else $('status').textContent='FLIGHT TO '+flightRouteName.toUpperCase()+' · '+(routeDistance/1000).toFixed(1)+' km RESTSTRECKE';}
   planeGroup.position.x+=forward.x*speed*dt;
   planeGroup.position.z+=forward.z*speed*dt;
   if(speed>18) altitude+=forward.y*speed*dt*4.5;
@@ -355,6 +357,9 @@ addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updat
 function openHangar(){paused=true;$('hangarOverlay').classList.add('show');renderHangar()}
 function closeHangar(){ $('hangarOverlay').classList.remove('show');paused=false}
 function renderHangar(){$('hangarCredits').textContent=credits.toLocaleString('de-AT');$('planeGrid').innerHTML='';planes.forEach((p,i)=>{let card=document.createElement('div');card.className='planeCard';let ownedNow=owned.has(i),selected=current===i;card.innerHTML='<div class="planeIcon">'+p.emoji+'</div><h3>'+p.name+'</h3><p>'+p.type+'<br>Max. ca. '+p.speed+' km/h</p><div class="price">'+(p.price===0?'GRATIS':'✦ '+p.price.toLocaleString('de-AT'))+'</div><button class="uiBtn '+(selected?'primary':'')+'">'+(selected?'AUSGEWÄHLT':ownedNow?'FLIEGEN':'KAUFEN')+'</button>';card.querySelector('button').onclick=()=>{if(ownedNow){current=i;makePlane(i);resetFlight();save();ui();renderHangar();closeHangar()}else if(credits>=p.price){credits-=p.price;owned.add(i);current=i;makePlane(i);resetFlight();save();ui();renderHangar();closeHangar()}else{$('status').textContent='ZU WENIG CREDITS — FLUGBONUS ODER PAYPAL';alert('Du hast zu wenig Credits. Du kannst den kostenlosen Flugbonus nutzen oder die PayPal-Spendenseite öffnen. Eine Spende schreibt Credits nicht automatisch gut.')}};$('planeGrid').appendChild(card)})}
+function startAutoFlight(destination){flightRouteName=destination.name;flightRouteTarget={x:destination.x,z:destination.z};autoLandingEnabled=false;$('autoLandBtn').textContent='AUTO-LANDUNG: AUS';autopilotEnabled=true;autopilotAltitude=Math.max(80,altitude);autopilotHeading=heading;throttle=100;$('throttle').value=100;steerX=0;steerY=0;gyroX=0;gyroY=0;gear=false;gearTarget=0;$('gearBtn').textContent='▱ FAHRWERK: EIN';$('autopilotBtn').textContent='AUTOPILOT: AN';paused=false;$('pauseOverlay').classList.remove('show');$('hangarOverlay').classList.remove('show');$('missionsOverlay').classList.remove('show');$('status').textContent='FLIGHT TO '+destination.name.toUpperCase()+' · AUTOPILOT AKTIV';}
+$('flightNYBtn').onclick=()=>startAutoFlight({name:'New York',x:-850,z:-13490});
+$('flightLABtn').onclick=()=>startAutoFlight({name:'Los Angeles',x:2200,z:-34720});
 $('hangarBtn').onclick=openHangar;$('closeHangar').onclick=closeHangar;$('missionsBtn').onclick=openMissions;$('closeMissions').onclick=()=>{$('missionsOverlay').classList.remove('show');paused=false};$('missionBackToFlight').onclick=()=>{$('missionsOverlay').classList.remove('show');paused=false};let cockpitLookYaw=0,cockpitLookPitch=0,passengerLookYaw=0,passengerLookPitch=0,cockpitTouchId=null,cockpitLastX=0,cockpitLastY=0;
 const gameCanvas=renderer.domElement;
 gameCanvas.addEventListener('pointerdown',e=>{if((view!==2&&view!==3)||paused||$('startOverlay').classList.contains('show')||$('hangarOverlay').classList.contains('show')||$('missionsOverlay').classList.contains('show')||$('pauseOverlay').classList.contains('show'))return;cockpitTouchId=e.pointerId;cockpitLastX=e.clientX;cockpitLastY=e.clientY;gameCanvas.setPointerCapture(e.pointerId);});
