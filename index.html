@@ -359,13 +359,9 @@ function setOnFootMode(enabled){
   speed=0;throttle=0;$('throttle').value=0;$('throttleVal').textContent='0%';
   flightRouteTarget=null;autopilotEnabled=false;autoLandingEnabled=false;
   planeGroup.visible=false;
-  // Switch immediately to a standalone on-foot camera, independent of the aircraft.
-  if(footGroup){
-   footCameraYaw=footYaw;footCameraPitch=-.12;
-   const fwd=new THREE.Vector3(Math.sin(footCameraYaw),0,-Math.cos(footCameraYaw));
-   camera.position.set(footGroup.position.x-fwd.x*95,footGroup.position.y+48,footGroup.position.z-fwd.z*95);
-   camera.lookAt(footGroup.position.x+fwd.x*28,footGroup.position.y+12+footCameraPitch*60,footGroup.position.z+fwd.z*28);
-  }
+  // Keep the camera update inside the animation loop; it switches to the
+  // on-foot follow camera on the next frame, independently of the aircraft.
+  footCameraYaw=footYaw;footCameraPitch=-.12;
   $('status').textContent='ZU FUSS UNTERWEGS · FINDE DIE ZOMBIES';stick.querySelector('.controlLabel').textContent='LAUFEN';
  }else{
   planeGroup.visible=true;
