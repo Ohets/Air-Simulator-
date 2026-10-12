@@ -224,7 +224,7 @@ try{
 
  // SAN FRANCISCO: bayfront skyline, hills, Golden Gate Bridge and an international airport.
  const sfX=-900,sfZ=-55000;
- const sfWaterMat=new THREE.MeshStandardMaterial({color:0x347fa9,roughness:.5}),sfLandMat=new THREE.MeshStandardMaterial({color:0xb5ad8b,roughness:1});
+ const sfWaterMat=new THREE.MeshStandardMaterial({color:0x347fa9,roughness:.5}),sfLandMat=new THREE.MeshStandardMaterial({color:0x56834a,roughness:1});
  const sfBay=new THREE.Mesh(new THREE.PlaneGeometry(6200,3900),sfWaterMat);sfBay.rotation.x=-Math.PI/2;sfBay.position.set(sfX+1150,-17.9,sfZ+100);scene.add(sfBay);
  const sfLand=new THREE.Mesh(new THREE.PlaneGeometry(2600,3200),sfLandMat);sfLand.rotation.x=-Math.PI/2;sfLand.position.set(sfX-1050,-14.65,sfZ+50);scene.add(sfLand);
  const sfRoad=new THREE.MeshStandardMaterial({color:0x45494b,roughness:1}),sfConcrete=new THREE.MeshStandardMaterial({color:0xa9b0b2,roughness:.85}),sfGlass=new THREE.MeshStandardMaterial({color:0x668da2,metalness:.2,roughness:.35}),sfRed=new THREE.MeshStandardMaterial({color:0xc94b32,roughness:.7});
