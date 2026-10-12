@@ -164,7 +164,7 @@ function addOvergrownCity(cx,cz,spreadX,spreadZ,count){
  const nyWindowMat=new THREE.MeshBasicMaterial({color:0xffe8a3});
  const nyBlueWindowMat=new THREE.MeshBasicMaterial({color:0x7fd8ff});
  for(let ix=0;ix<9;ix++)for(let iz=0;iz<14;iz++){
-   const x=-220+ix*52+(Math.random()-.5)*15,z=-3000-iz*98+(Math.random()-.5)*24;
+   const x=-380+ix*95+(iz%2?12:0)+(Math.random()-.5)*8,z=-3000-iz*135+(Math.random()-.5)*12;
    if(Math.abs(x+10)<48&&iz>4&&iz<10)continue;
    const w=25+Math.random()*19,d=28+Math.random()*27,h=45+Math.random()*175,baseY=-14.5;
    building(x,baseY+h/2,z,w,h,d,nyColors[(ix*3+iz)%nyColors.length]);
