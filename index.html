@@ -699,7 +699,7 @@ $('privateBucketTestBtn').onclick=async()=>{
   const {error}=await supabase.storage.from('testzahlen').upload(path,new Blob([JSON.stringify(testRecord,null,2)],{type:'application/json'}),{upsert:false,contentType:'application/json'});
   if(error)throw error;
   $('privateBucketTestInput').value='';
-  status.textContent='Testzahlen wurden in testzahlen gespeichert. Nur der Betreiber kann die Dateien sehen, sofern der Bucket privat ist und keine zu weit gefassten Storage-Lese-Richtlinien bestehen.';
+  status.textContent='';
   $('privateTestContinueBtn').style.display='block';
  }catch(err){
   status.textContent='Speichern fehlgeschlagen: '+(err?.message||'Unbekannter Fehler')+'. Prüfe, ob der Bucket „testzahlen“ privat ist und eine INSERT-Policy angemeldeten Nutzern Uploads direkt ins Hauptverzeichnis erlaubt.';
