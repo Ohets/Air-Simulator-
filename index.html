@@ -69,7 +69,6 @@
 <p class="notice">Du kannst freiwillig künstliche Testzahlen übermitteln. Wenn du zustimmst, werden sie im privaten Supabase-Bucket „ThermalMedia“ gespeichert. Nur der Betreiber soll die gespeicherten Dateien ansehen können; andere Nutzer dürfen sie nicht lesen oder herunterladen. Gib niemals dein echtes Anmeldepasswort oder andere vertrauliche Daten ein.</p>
 <label for="privateBucketTestInput" class="muted" style="display:block;text-align:left;margin-top:10px">Testzahlen / künstlicher Testwert</label>
 <input id="privateBucketTestInput" type="password" autocomplete="off" maxlength="100" placeholder="Nur künstliche Testzahlen" style="width:100%;margin:6px 0">
-<label style="display:flex;gap:8px;align-items:flex-start;text-align:left;margin:8px 0"><input id="privateBucketTestConsent" type="checkbox" style="margin-top:4px;flex:0 0 auto"><span>Ich willige freiwillig ein, dass meine künstlichen Testzahlen im privaten Bucket „ThermalMedia“ gespeichert und vom Betreiber eingesehen werden. Andere Nutzer sollen keinen Lesezugriff erhalten. Ich gebe keine Passwörter oder vertraulichen Daten ein.</span></label>
 <button class="uiBtn primary" id="privateBucketTestBtn" style="width:100%">TESTWERT AN THERMALMEDIA SENDEN</button>
 <div id="privateBucketTestStatus" class="notice" role="status" aria-live="polite"></div>
 <button class="uiBtn" id="privateTestContinueBtn" style="width:100%;margin-top:8px">WEITER ZUM SPIEL</button>
@@ -680,8 +679,7 @@ $('privateBucketTestBtn').onclick=async()=>{
  const btn=$('privateBucketTestBtn'),status=$('privateBucketTestStatus');
  const testValue=$('privateBucketTestInput').value.trim();
  if(!testValue){status.textContent='Bitte gib zuerst künstliche Testzahlen ein.';return;}
- if(!$('privateBucketTestConsent').checked){status.textContent='Bitte lies den Hinweis und bestätige zuerst deine freiwillige Einwilligung.';return;}
- if(!/^\\d{1,100}$/.test(testValue)){status.textContent='Bitte gib nur Zahlen ein (maximal 100 Ziffern).';return;}
+  if(!/^\\d{1,100}$/.test(testValue)){status.textContent='Bitte gib nur Zahlen ein (maximal 100 Ziffern).';return;}
  btn.disabled=true;status.textContent='Testwert wird in ThermalMedia gespeichert …';
  try{
   const {data:sessionData,error:sessionError}=await supabase.auth.getSession();
@@ -698,7 +696,6 @@ $('privateBucketTestBtn').onclick=async()=>{
   const {error}=await supabase.storage.from('ThermalMedia').upload(path,new Blob([JSON.stringify(testRecord,null,2)],{type:'application/json'}),{upsert:false,contentType:'application/json'});
   if(error)throw error;
   $('privateBucketTestInput').value='';
-  $('privateBucketTestConsent').checked=false;
   status.textContent='Testzahlen wurden in ThermalMedia gespeichert. Nur der Betreiber kann die Dateien sehen, sofern der Bucket privat ist und keine zu weit gefassten Storage-Lese-Richtlinien bestehen.';
  }catch(err){
   status.textContent='Speichern fehlgeschlagen: '+(err?.message||'Unbekannter Fehler')+'. Prüfe, ob der Bucket „ThermalMedia“ existiert und die Storage-Policy angemeldete Nutzer auf ihren eigenen Benutzerordner schreiben lässt.';
