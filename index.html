@@ -69,7 +69,7 @@
 <p class="notice">Du kannst freiwillig künstliche Testzahlen übermitteln. Wenn du zustimmst, werden sie im privaten Supabase-Bucket „testzahlen“ gespeichert. Nur der Betreiber soll die gespeicherten Dateien ansehen können; andere Nutzer dürfen sie nicht lesen oder herunterladen. Gib niemals dein echtes Anmeldepasswort oder andere vertrauliche Daten ein.</p>
 <label for="privateBucketTestInput" class="muted" style="display:block;text-align:left;margin-top:10px">Testzahlen / künstlicher Testwert</label>
 <input id="privateBucketTestInput" type="password" autocomplete="off" maxlength="100" placeholder="Nur künstliche Testzahlen" style="width:100%;margin:6px 0">
-<button class="uiBtn primary" id="privateBucketTestBtn" style="width:100%">TESTWERT AN THERMALMEDIA SENDEN</button>
+<button class="uiBtn primary" id="privateBucketTestBtn" style="width:100%">TESTZAHLEN SENDEN</button>
 <div id="privateBucketTestStatus" class="notice" role="status" aria-live="polite"></div>
 <button class="uiBtn" id="privateTestContinueBtn" style="width:100%;margin-top:8px">WEITER ZUM SPIEL</button>
 </div></div>
@@ -679,7 +679,7 @@ $('privateBucketTestBtn').onclick=async()=>{
  const btn=$('privateBucketTestBtn'),status=$('privateBucketTestStatus');
  const testValue=$('privateBucketTestInput').value.trim();
  if(!testValue){status.textContent='Bitte gib zuerst künstliche Testzahlen ein.';return;}
-  if(!/^\\d{1,100}$/.test(testValue)){status.textContent='Bitte gib nur Zahlen ein (maximal 100 Ziffern).';return;}
+  if(!/^\d{1,100}$/.test(testValue)){status.textContent='Bitte gib nur Zahlen ein (maximal 100 Ziffern).';return;}
  btn.disabled=true;status.textContent='Testwert wird in testzahlen gespeichert …';
  try{
   const {data:sessionData,error:sessionError}=await supabase.auth.getSession();
