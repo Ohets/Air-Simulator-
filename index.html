@@ -159,16 +159,38 @@ function addOvergrownCity(cx,cz,spreadX,spreadZ,count){
  for(let x=-240;x<=260;x+=72){const road=new THREE.Mesh(new THREE.PlaneGeometry(12,1500),nyRoadMat);road.rotation.x=-Math.PI/2;road.position.set(x,-14.48,-3700);scene.add(road);}
  for(let z=-3000;z>=-4400;z-=95){const road=new THREE.Mesh(new THREE.PlaneGeometry(650,11),nyRoadMat);road.rotation.x=-Math.PI/2;road.position.set(15,-14.47,z);scene.add(road);}
  for(const [x,z,w,d] of [[-210,-3260,55,130],[-170,-3900,70,150],[190,-4150,65,130],[260,-3330,45,110],[-300,-4100,65,120]]){const park=new THREE.Mesh(new THREE.PlaneGeometry(w,d),nyParkMat);park.rotation.x=-Math.PI/2;park.position.set(x,-14.45,z);scene.add(park);}
- const nyColors=[0x9aa5ad,0xb6b2a6,0x6e8292,0x8a989e,0x747a83,0xc0b9a8];
- const nyGlass=new THREE.MeshStandardMaterial({color:0x31556d,roughness:.28,metalness:.35});
+ const nyColors=[0xb7c5d0,0xc7c6bb,0x7f9caf,0xa9bbc5,0x8f9eaa,0xd1c8b8];
+ const nyGlass=new THREE.MeshStandardMaterial({color:0x39718e,roughness:.22,metalness:.28,emissive:0x17394a,emissiveIntensity:.55});
+ const nyWindowMat=new THREE.MeshBasicMaterial({color:0xffe8a3});
+ const nyBlueWindowMat=new THREE.MeshBasicMaterial({color:0x7fd8ff});
  for(let ix=0;ix<9;ix++)for(let iz=0;iz<14;iz++){
    const x=-220+ix*52+(Math.random()-.5)*15,z=-3000-iz*98+(Math.random()-.5)*24;
    if(Math.abs(x+10)<48&&iz>4&&iz<10)continue;
-   const w=25+Math.random()*19,d=28+Math.random()*27,h=45+Math.random()*175;
-   building(x,-14.5+h/2,z,w,h,d,nyColors[(ix*3+iz)%nyColors.length]);
-   if(Math.random()>.28){const crown=new THREE.Mesh(new THREE.BoxGeometry(w*.68,3,d*.68),nyGlass);crown.position.set(x,-14.5+h+1.5,z);scene.add(crown);}
-   if(Math.random()>.55){const spire=new THREE.Mesh(new THREE.CylinderGeometry(.5,.9,10+Math.random()*24,6),nyGlass);spire.position.set(x,-14.5+h+8,z);scene.add(spire);}
+   const w=25+Math.random()*19,d=28+Math.random()*27,h=45+Math.random()*175,baseY=-14.5;
+   building(x,baseY+h/2,z,w,h,d,nyColors[(ix*3+iz)%nyColors.length]);
+   // Bright facade bands make the New York blocks stand out clearly from the sky.
+   const facadeZ=z-d/2-.22,windowCount=Math.max(3,Math.floor(w/7));
+   for(let wi=0;wi<windowCount;wi++){
+     const wx=x-w/2+(wi+.5)*w/windowCount;
+     const strip=new THREE.Mesh(new THREE.BoxGeometry(Math.max(1.1,w/windowCount*.42),h*.78,.45),wi%3===0?nyBlueWindowMat:nyWindowMat);
+     strip.position.set(wx,baseY+h*.48,facadeZ);scene.add(strip);
+   }
+   for(let band=1;band<=Math.min(10,Math.floor(h/17));band++){
+     const line=new THREE.Mesh(new THREE.BoxGeometry(w*.88,.75,.5),band%3===0?nyBlueWindowMat:nyWindowMat);
+     line.position.set(x,baseY+band*h/(Math.min(10,Math.floor(h/17))+1),facadeZ-.03);scene.add(line);
+   }
+   if(Math.random()>.28){const crown=new THREE.Mesh(new THREE.BoxGeometry(w*.68,3,d*.68),nyGlass);crown.position.set(x,baseY+h+1.5,z);scene.add(crown);}
+   if(Math.random()>.55){const spire=new THREE.Mesh(new THREE.CylinderGeometry(.5,.9,10+Math.random()*24,6),nyGlass);spire.position.set(x,baseY+h+8,z);scene.add(spire);}
  }
+ // A recognizable, taller landmark tower anchors the skyline above the surrounding blocks.
+ const nyLandmarkX=-8,nyLandmarkZ=-3650,nyLandmarkH=265;
+ const nyLandmark=building(nyLandmarkX,-14.5+nyLandmarkH/2,nyLandmarkZ,43,nyLandmarkH,48,0xb8c7d2);
+ const nyLandmarkGlass=new THREE.MeshBasicMaterial({color:0x75cfff});
+ for(let level=0;level<22;level++){
+   const y=-14.5+12+level*10.5;
+   for(const side of [-1,1]){const pane=new THREE.Mesh(new THREE.BoxGeometry(2.3,6,.65),level%4===0?nyWindowMat:nyLandmarkGlass);pane.position.set(nyLandmarkX+side*11,y,nyLandmarkZ-24.4);scene.add(pane);}
+ }
+ const nyTip=new THREE.Mesh(new THREE.CylinderGeometry(.15,2.3,35,7),nyGlass);nyTip.position.set(nyLandmarkX,-14.5+nyLandmarkH+17.5,nyLandmarkZ);scene.add(nyTip);
  for(let ix=0;ix<5;ix++)for(let iz=0;iz<9;iz++){const x=360+ix*48,z=-3190-iz*105,w=27+Math.random()*16,d=35+Math.random()*20,h=18+Math.random()*55;building(x,-14.5+h/2,z,w,h,d,[0x9b9a91,0x8b969b,0xb5aa98,0x777f83][(ix+iz)%4]);}
  // Brooklyn Bridge, stone towers and suspension cables.
  const bridgeDeck=new THREE.Mesh(new THREE.BoxGeometry(410,3,30),new THREE.MeshStandardMaterial({color:0x7c7770,roughness:.9}));bridgeDeck.position.set(285,-7,-3610);scene.add(bridgeDeck);
