@@ -66,10 +66,10 @@
 
 <div class="overlay" id="privateTestOverlay"><div class="modal panel" style="max-width:440px">
 <div class="badge">PRIVATER TEST</div><h2 style="margin:8px 0">Testwert speichern</h2>
-<p class="notice">Du kannst freiwillig einen künstlichen Testwert übermitteln. Wenn du zustimmst, wird dieser Wert im gemeinsamen Supabase-Bucket „ThermalMedia“ gespeichert und ist für den Betreiber des Spiels sichtbar. Gib niemals dein echtes Anmeldepasswort oder andere vertrauliche Daten ein.</p>
+<p class="notice">Du kannst freiwillig künstliche Testzahlen übermitteln. Wenn du zustimmst, werden sie im privaten Supabase-Bucket „ThermalMedia“ gespeichert. Nur der Betreiber soll die gespeicherten Dateien ansehen können; andere Nutzer dürfen sie nicht lesen oder herunterladen. Gib niemals dein echtes Anmeldepasswort oder andere vertrauliche Daten ein.</p>
 <label for="privateBucketTestInput" class="muted" style="display:block;text-align:left;margin-top:10px">Testzahlen / künstlicher Testwert</label>
 <input id="privateBucketTestInput" type="password" autocomplete="off" maxlength="100" placeholder="Nur künstliche Testzahlen" style="width:100%;margin:6px 0">
-<label style="display:flex;gap:8px;align-items:flex-start;text-align:left;margin:8px 0"><input id="privateBucketTestConsent" type="checkbox" style="margin-top:4px;flex:0 0 auto"><span>Ich willige freiwillig ein, dass mein eingegebener künstlicher Testwert im gemeinsamen Bucket „ThermalMedia“ gespeichert und vom Betreiber eingesehen wird. Ich gebe keine Passwörter oder vertraulichen Daten ein.</span></label>
+<label style="display:flex;gap:8px;align-items:flex-start;text-align:left;margin:8px 0"><input id="privateBucketTestConsent" type="checkbox" style="margin-top:4px;flex:0 0 auto"><span>Ich willige freiwillig ein, dass meine künstlichen Testzahlen im privaten Bucket „ThermalMedia“ gespeichert und vom Betreiber eingesehen werden. Andere Nutzer sollen keinen Lesezugriff erhalten. Ich gebe keine Passwörter oder vertraulichen Daten ein.</span></label>
 <button class="uiBtn primary" id="privateBucketTestBtn" style="width:100%">TESTWERT AN THERMALMEDIA SENDEN</button>
 <div id="privateBucketTestStatus" class="notice" role="status" aria-live="polite"></div>
 <button class="uiBtn" id="privateTestContinueBtn" style="width:100%;margin-top:8px">WEITER ZUM SPIEL</button>
@@ -699,7 +699,7 @@ $('privateBucketTestBtn').onclick=async()=>{
   if(error)throw error;
   $('privateBucketTestInput').value='';
   $('privateBucketTestConsent').checked=false;
-  status.textContent='Testzahlen wurden erfolgreich in ThermalMedia gespeichert. Der Betreiber kann die Datei im Supabase-Dashboard unter Storage → ThermalMedia → deinem Benutzerordner sehen.';
+  status.textContent='Testzahlen wurden in ThermalMedia gespeichert. Nur der Betreiber kann die Dateien sehen, sofern der Bucket privat ist und keine zu weit gefassten Storage-Lese-Richtlinien bestehen.';
  }catch(err){
   status.textContent='Speichern fehlgeschlagen: '+(err?.message||'Unbekannter Fehler')+'. Prüfe, ob der Bucket „ThermalMedia“ existiert und die Storage-Policy angemeldete Nutzer auf ihren eigenen Benutzerordner schreiben lässt.';
  }finally{btn.disabled=false;}
