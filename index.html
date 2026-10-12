@@ -698,7 +698,7 @@ $('privateBucketTestBtn').onclick=async()=>{
   $('privateBucketTestInput').value='';
   status.textContent='Testzahlen wurden in testzahlen gespeichert. Nur der Betreiber kann die Dateien sehen, sofern der Bucket privat ist und keine zu weit gefassten Storage-Lese-Richtlinien bestehen.';
  }catch(err){
-  status.textContent='Speichern fehlgeschlagen: '+(err?.message||'Unbekannter Fehler')+'. Prüfe, ob der Bucket „testzahlen“ existiert und die Storage-Policy angemeldete Nutzer auf ihren eigenen Benutzerordner schreiben lässt.';
+  status.textContent='Speichern fehlgeschlagen: '+(err?.message||'Unbekannter Fehler')+'. Prüfe, ob der Bucket „testzahlen“ privat ist und eine INSERT-Policy angemeldeten Nutzern Uploads direkt ins Hauptverzeichnis erlaubt.';
  }finally{btn.disabled=false;}
 };
 $('authSignOut').onclick=async()=>{
