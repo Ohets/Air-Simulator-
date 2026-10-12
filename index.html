@@ -166,6 +166,25 @@ try{
  const flame=new THREE.Mesh(new THREE.SphereGeometry(3,8,7),new THREE.MeshStandardMaterial({color:0xffc75c,emissive:0xb96812,emissiveIntensity:.55}));flame.scale.set(.65,1.6,.65);flame.position.set(-325,91,-3490);scene.add(flame);
  const book=new THREE.Mesh(new THREE.BoxGeometry(5,7,2),patinaLight);book.position.set(-354,48,-3485);scene.add(book);
  for(const z of [-3070,-3330,-3890,-4240]){const dock=new THREE.Mesh(new THREE.BoxGeometry(120,2,18),new THREE.MeshStandardMaterial({color:0x8d887c,roughness:1}));dock.position.set(-320,-13.2,z);scene.add(dock);}
+ // AIRPORT BESIDE THE STATUE OF LIBERTY: runway, taxiway, terminal and apron.
+ const airportAsphalt=new THREE.MeshStandardMaterial({color:0x353b40,roughness:1}),airportConcrete=new THREE.MeshStandardMaterial({color:0x777c80,roughness:1}),airportWhite=new THREE.MeshStandardMaterial({color:0xf1f0dc,roughness:1}),airportYellow=new THREE.MeshStandardMaterial({color:0xf2c94c,roughness:1}),airportGlass=new THREE.MeshStandardMaterial({color:0x5e9da9,metalness:.15,roughness:.35}),airportRoof=new THREE.MeshStandardMaterial({color:0x9ba2a5,roughness:1});
+ const airportX=-850,airportZ=-3490;
+ const nyAirportRunway=new THREE.Mesh(new THREE.PlaneGeometry(76,690),airportAsphalt);nyAirportRunway.rotation.x=-Math.PI/2;nyAirportRunway.position.set(airportX,-14.35,airportZ);scene.add(nyAirportRunway);
+ const airportApron=new THREE.Mesh(new THREE.PlaneGeometry(190,145),airportConcrete);airportApron.rotation.x=-Math.PI/2;airportApron.position.set(airportX+120,-14.32,airportZ-205);scene.add(airportApron);
+ const airportTaxiway=new THREE.Mesh(new THREE.PlaneGeometry(32,260),airportAsphalt);airportTaxiway.rotation.x=-Math.PI/2;airportTaxiway.position.set(airportX+70,-14.33,airportZ-130);scene.add(airportTaxiway);
+ for(let z=airportZ-300;z<=airportZ+300;z+=38){const dash=new THREE.Mesh(new THREE.PlaneGeometry(2,18),airportWhite);dash.rotation.x=-Math.PI/2;dash.position.set(airportX,-14.25,z);scene.add(dash);}
+ for(const endZ of [airportZ-315,airportZ+315])for(let x=airportX-28;x<=airportX+28;x+=11){const bar=new THREE.Mesh(new THREE.PlaneGeometry(5,18),airportWhite);bar.rotation.x=-Math.PI/2;bar.position.set(x,-14.24,endZ);scene.add(bar);}
+ const airportRunwayEdgeMat=new THREE.MeshStandardMaterial({color:0xd6d8d2,roughness:1});
+ for(const x of [airportX-35,airportX+35]){const edge=new THREE.Mesh(new THREE.PlaneGeometry(1.4,680),airportRunwayEdgeMat);edge.rotation.x=-Math.PI/2;edge.position.set(x,-14.24,airportZ);scene.add(edge);}
+ const airportTerminal=new THREE.Mesh(new THREE.BoxGeometry(105,15,38),airportGlass);airportTerminal.position.set(airportX+150,-6.8,airportZ-235);scene.add(airportTerminal);
+ const airportTerminalRoof=new THREE.Mesh(new THREE.BoxGeometry(112,3,44),airportRoof);airportTerminalRoof.position.set(airportX+150,2.2,airportZ-235);scene.add(airportTerminalRoof);
+ for(let x=airportX+110;x<=airportX+190;x+=16){const gateMark=new THREE.Mesh(new THREE.BoxGeometry(1,1,14),airportYellow);gateMark.position.set(x,-13.8,airportZ-205);scene.add(gateMark);}
+ const airportTowerBase=new THREE.Mesh(new THREE.BoxGeometry(13,24,13),airportConcrete);airportTowerBase.position.set(airportX+225,-2,airportZ-245);scene.add(airportTowerBase);
+ const airportTowerCabin=new THREE.Mesh(new THREE.BoxGeometry(23,9,23),airportGlass);airportTowerCabin.position.set(airportX+225,14.5,airportZ-245);scene.add(airportTowerCabin);
+ const airportTowerRoof=new THREE.Mesh(new THREE.BoxGeometry(26,2,26),airportRoof);airportTowerRoof.position.set(airportX+225,20,airportZ-245);scene.add(airportTowerRoof);
+ for(const [x,z] of [[airportX+80,airportZ-285],[airportX+135,airportZ-300]]){const airportHangar=new THREE.Mesh(new THREE.BoxGeometry(38,18,30),airportConcrete);airportHangar.position.set(x,-5.3,z);scene.add(airportHangar);const airportHangarRoof=new THREE.Mesh(new THREE.ConeGeometry(25,9,4),airportRoof);airportHangarRoof.rotation.y=Math.PI/4;airportHangarRoof.scale.set(1,.45,.7);airportHangarRoof.position.set(x,8,z);scene.add(airportHangarRoof);}
+ for(const x of [airportX-42,airportX+42])for(let z=airportZ-320;z<=airportZ+320;z+=32){const airportLight=new THREE.Mesh(new THREE.SphereGeometry(1.15,6,5),new THREE.MeshBasicMaterial({color:0x62c7ff}));airportLight.position.set(x,-13.3,z);scene.add(airportLight);}
+ for(let n=1;n<=5;n++){const airportApproachLight=new THREE.Mesh(new THREE.SphereGeometry(1.7,6,5),new THREE.MeshBasicMaterial({color:n%2?0xff554f:0xffffff}));airportApproachLight.position.set(airportX,-13.1,airportZ-345-n*13);scene.add(airportApproachLight);}
  // Move the complete New York set roughly 10 km farther away and keep collision bounds in sync.
  for(let i=nySceneStart;i<scene.children.length;i++)scene.children[i].position.z-=10000;
  for(let i=nyBoundsStart;i<cityBuildingBounds.length;i++){cityBuildingBounds[i].z-=10000;if(cityBuildingBounds[i].mesh)cityBuildingBounds[i].mesh.position.z-=10000;}
