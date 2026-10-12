@@ -11,6 +11,14 @@
 #passengerFrame:before{content:"PASSAGIERANSICHT · FENSTERPLATZ";position:absolute;left:50%;bottom:-18px;transform:translateX(-50%);white-space:nowrap;background:#172735;color:#eaf8ff;padding:5px 12px;border-radius:0 0 9px 9px;font-size:10px;font-weight:800;letter-spacing:.08em}
 .overlay{position:fixed;inset:0;background:linear-gradient(135deg,#061425eF,#102c48e8);display:none;align-items:center;justify-content:center;padding:14px;z-index:10;overflow:auto;touch-action:pan-y}.overlay.show{display:flex}.modal{width:min(900px,100%);max-height:94vh;overflow:auto;padding:18px}.modalHead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.modal h2{margin:0;font-size:22px}.muted{color:#9bb8cd;font-size:12px}.planeGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px}.planeCard{border:1px solid var(--line);background:#10243a;border-radius:12px;padding:12px;min-width:0}.planeIcon{height:72px;display:flex;align-items:center;justify-content:center;font-size:43px;background:linear-gradient(140deg,#173c58,#091626);border-radius:9px;margin-bottom:9px}.planeCard h3{font-size:13px;margin:0 0 4px}.planeCard p{font-size:11px;color:#a7c3d8;margin:0 0 9px;min-height:28px}.planeCard .price{font-weight:900;color:#72e5ff;font-size:13px;margin-bottom:9px}.planeCard button{width:100%}.modalFooter{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}.notice{font-size:12px;line-height:1.55;color:#b7cede;margin:12px 0}.badge{font-size:10px;color:#8ce9ff;text-transform:uppercase;letter-spacing:.1em}.hidden{display:none!important}
 @media(max-width:600px){.top{top:7px;left:7px;right:7px;padding:8px}.brand{font-size:11px}.stat{font-size:10px}.stat strong{font-size:14px}.rightStats{gap:9px}.actions{top:65px;left:7px;right:7px;width:auto}.uiBtn{padding:8px 9px;font-size:11px}.bottomInfo{left:7px;bottom:142px;padding:7px 9px;font-size:10px}.stick{width:96px;height:96px}.knob{left:27px;top:27px;width:40px;height:40px}.throttle{width:62px;padding:7px}.throttle input{height:80px}.smallControls button{min-width:60px;padding:8px 6px}.flightControls{left:8px;right:8px;bottom:17px}.modal{padding:12px}.planeGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.planeIcon{height:55px;font-size:34px}}
+
+#emailSignupBtn{width:100%;margin-top:8px}
+#emailSignupForm{display:grid;gap:10px;text-align:left}
+#emailSignupForm input[type=email]{width:100%;padding:12px;border-radius:9px;border:1px solid var(--line);background:#08192a;color:#fff;font:inherit}
+#emailSignupForm label{font-size:12px;line-height:1.45;color:#c5d8e7;display:flex;gap:8px;align-items:flex-start}
+#emailSignupForm input[type=checkbox]{margin-top:3px;flex-shrink:0}
+#emailSignupStatus{min-height:18px;font-size:12px;line-height:1.4;color:#b7cede}
+
 </style>
 </head>
 <body>
@@ -35,12 +43,26 @@
  </div>
 </div>
 <div id="passengerFrame" aria-hidden="true"></div>
-<div class="overlay show" id="startOverlay"><div class="modal panel" style="max-width:520px;text-align:center"><div class="badge">FLIGHT EXPERIENCE</div><h2 style="margin:8px 0">Willkommen bei Air Simulator</h2><p class="muted">Eine mobile 3D-Flugsimulator-Spielwelt mit 20 Flugzeugen, Hangar und Credits.</p><div class="planeIcon" style="font-size:60px">✈️</div><p class="notice">Du startest mit 1.500 Credits. Fliege, sammle Flugerfahrung und schalte neue Flugzeuge frei. Die 3D-Szenerie und Flugphysik sind eine spielbare Basisversion.</p><button class="uiBtn primary" id="startBtn" style="width:100%;padding:13px">FLUG STARTEN</button><button class="uiBtn" id="startHangarBtn" style="width:100%;margin-top:8px">FLUGZEUGE ANSEHEN</button></div></div>
+<div class="overlay show" id="startOverlay"><div class="modal panel" style="max-width:520px;text-align:center"><div class="badge">FLIGHT EXPERIENCE</div><h2 style="margin:8px 0">Willkommen bei Air Simulator</h2><p class="muted">Eine mobile 3D-Flugsimulator-Spielwelt mit 20 Flugzeugen, Hangar und Credits.</p><div class="planeIcon" style="font-size:60px">✈️</div><p class="notice">Du startest mit 1.500 Credits. Fliege, sammle Flugerfahrung und schalte neue Flugzeuge frei. Die 3D-Szenerie und Flugphysik sind eine spielbare Basisversion.</p><button class="uiBtn primary" id="startBtn" style="width:100%;padding:13px">FLUG STARTEN</button><button class="uiBtn" id="startHangarBtn" style="width:100%;margin-top:8px">FLUGZEUGE ANSEHEN</button><button class="uiBtn" id="emailSignupBtn">✉ NEWS & UPDATES</button></div></div>
+
+<div class="overlay" id="emailSignupOverlay"><div class="modal panel" style="max-width:480px">
+<div class="badge">AIR SIMULATOR</div><h2 style="margin:8px 0">News & Updates</h2>
+<p class="notice">Trage deine E-Mail-Adresse freiwillig ein, wenn du Neuigkeiten und Updates zu Air Simulator erhalten möchtest. Die Angabe ist optional und hat keinen Einfluss auf das Spiel.</p>
+<form id="emailSignupForm">
+<input id="signupEmail" type="email" autocomplete="email" maxlength="254" placeholder="deine@email.at" required>
+<label><input id="signupConsent" type="checkbox" required><span>Ich willige ein, dass meine E-Mail-Adresse gespeichert und vom Betreiber von Air Simulator verwendet wird, um mir Neuigkeiten und Updates zum Spiel per E-Mail zu senden. Ich kann meine Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen. Weitere Informationen zur verantwortlichen Person, Speicherdauer, meinen Rechten und zum Widerruf müssen in der Datenschutzerklärung bereitgestellt werden.</span></label>
+<p class="notice">Deine Adresse wird mit dieser Funktion nicht an Dritte weitergegeben oder verkauft. Dafür wäre eine gesonderte, konkrete Einwilligung erforderlich.</p>
+<div id="emailSignupStatus" role="status" aria-live="polite"></div>
+<button class="uiBtn primary" id="emailSignupSubmit" type="submit" style="width:100%">EINWILLIGEN & ANMELDEN</button>
+<button class="uiBtn" id="emailSignupClose" type="button" style="width:100%">SCHLIESSEN</button>
+</form></div></div>
 <div class="overlay" id="missionsOverlay"><div class="modal panel"><div class="modalHead"><div><div class="badge">FLIGHT OPERATIONS</div><h2>Flugmissionen</h2><div class="muted">Schließe Missionen ab und verdiene Credits.</div></div><div style="text-align:right"><div class="muted">DEINE CREDITS</div><strong style="color:var(--cyan);font-size:20px">✦ <span id="missionCredits">1500</span></strong><button class="uiBtn" id="closeMissions" style="display:block;margin-top:7px">SCHLIESSEN ✕</button></div></div><div id="missionList" class="planeGrid"></div><div class="modalFooter"><button class="uiBtn" id="missionBackToFlight">ZURÜCK ZUM FLUG</button></div></div></div>
 <div class="overlay" id="hangarOverlay"><div class="modal panel"><div class="modalHead"><div><div class="badge">FLEET MANAGEMENT</div><h2>Flugzeug-Hangar</h2><div class="muted">Wähle dein nächstes Flugzeug</div></div><div style="text-align:right"><div class="muted">DEINE CREDITS</div><strong style="color:var(--cyan);font-size:20px">✦ <span id="hangarCredits">1500</span></strong><button class="uiBtn" id="closeHangar" style="display:block;margin-top:7px">SCHLIESSEN ✕</button></div></div><div id="planeGrid" class="planeGrid"></div><div class="modalFooter"><button class="uiBtn primary" id="donateBtn">♥ Credits unterstützen / PayPal</button><button class="uiBtn" id="earnBtn">✦ Flugbonus +100</button></div><p class="notice">PayPal öffnet deine Spendenseite. Wichtig: Eine Spende wird von diesem Spiel nicht automatisch erkannt und schreibt daher keine Credits automatisch gut. Für automatische Käufe wäre eine serverseitige, sichere Zahlungsintegration erforderlich. Der Flugbonus ist ein kostenloser Spielbonus.</p></div></div>
 <div class="overlay" id="pauseOverlay"><div class="modal panel" style="max-width:360px;text-align:center"><h2>Flug pausiert</h2><p class="muted">Dein Flug wurde angehalten.</p><button class="uiBtn primary" id="resumeBtn" style="width:100%">WEITERFLIEGEN</button><button class="uiBtn" id="pauseHangarBtn" style="width:100%;margin-top:8px">HANGAR ÖFFNEN</button></div></div>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
+const SUPABASE_URL='https://spboyylbuftzzpfkyhsy.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNwYm95eWxidWZ0enpwZmt5aHN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExOTQ4ODgsImV4cCI6MjEwNjc3MDg4OH0.vHSZlFGq-0QmUHo-PN8kFvS6P2Ahar6Te-k9owF5m5I';
 const $=id=>document.getElementById(id);
 const paypal='https://www.paypal.com/donate/?hosted_button_id=HF3HYZ9J3QV4U';
 const planes=[
@@ -575,6 +597,28 @@ $('throttle').addEventListener('input',e=>{throttle=+e.target.value;ui()});
 const stick=$('stick'),knob=$('knob');let dragging=false;
 function moveStick(e){let r=stick.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,dx=(e.clientX-cx)/(r.width*.34),dy=(e.clientY-cy)/(r.height*.34);steerX=Math.max(-1,Math.min(1,dx));steerY=Math.max(-1,Math.min(1,dy));knob.style.transform='translate('+steerX*27+'px,'+steerY*27+'px)'}
 stick.addEventListener('pointerdown',e=>{dragging=true;stick.setPointerCapture(e.pointerId);moveStick(e)});stick.addEventListener('pointermove',e=>{if(dragging)moveStick(e)});function release(){dragging=false;steerX=0;steerY=0;knob.style.transform='translate(0,0)'}stick.addEventListener('pointerup',release);stick.addEventListener('pointercancel',release);
+
+$('emailSignupBtn').onclick=()=>{$('emailSignupStatus').textContent='';$('emailSignupOverlay').classList.add('show')};
+$('emailSignupClose').onclick=()=>{$('emailSignupOverlay').classList.remove('show')};
+$('emailSignupForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ const email=$('signupEmail').value.trim().toLowerCase();
+ if(!email||!$('signupConsent').checked)return;
+ const submit=$('emailSignupSubmit'),status=$('emailSignupStatus');
+ submit.disabled=true;status.textContent='Anmeldung wird gespeichert …';
+ try{
+  const response=await fetch(SUPABASE_URL+'/rest/v1/air_simulator_email_signups',{
+   method:'POST',
+   headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+   body:JSON.stringify({email,consent_updates:true,consent_text_version:'air-updates-v1'})
+  });
+  if(response.status===409){status.textContent='Diese E-Mail-Adresse ist bereits registriert.';}
+  else if(!response.ok){throw new Error('Speichern fehlgeschlagen ('+response.status+'). Bitte später erneut versuchen.');}
+  else{$('signupEmail').value='';$('signupConsent').checked=false;status.textContent='Danke! Deine Einwilligung wurde gespeichert. Ein Widerruf ist jederzeit möglich.';}
+ }catch(err){status.textContent=err.message||'Anmeldung fehlgeschlagen. Bitte später erneut versuchen.';}
+ finally{submit.disabled=false;}
+});
+
 $('donateBtn').onclick=()=>window.open(paypal,'_blank','noopener,noreferrer');
 $('earnBtn').onclick=()=>{credits+=100;save();ui();renderHangar();$('status').textContent='FLUGBONUS +100 CREDITS'};
 function startFlightAudio(){if(audioCtx){if(audioCtx.state==='suspended')audioCtx.resume();return;}try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();const master=audioCtx.createGain();master.gain.value=.8;master.connect(audioCtx.destination);engineOsc=audioCtx.createOscillator();engineOsc.type='sawtooth';engineGain=audioCtx.createGain();engineGain.gain.value=.025;const engineFilter=audioCtx.createBiquadFilter();engineFilter.type='lowpass';engineFilter.frequency.value=260;engineOsc.connect(engineFilter);engineFilter.connect(engineGain);engineGain.connect(master);engineOsc.start();const buffer=audioCtx.createBuffer(1,audioCtx.sampleRate*2,audioCtx.sampleRate);const data=buffer.getChannelData(0);for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*.35;rainNoiseSource=audioCtx.createBufferSource();rainNoiseSource.buffer=buffer;rainNoiseSource.loop=true;rainFilter=audioCtx.createBiquadFilter();rainFilter.type='lowpass';rainFilter.frequency.value=850;rainGain=audioCtx.createGain();rainGain.gain.value=.13;rainNoiseSource.connect(rainFilter);rainFilter.connect(rainGain);rainGain.connect(master);rainNoiseSource.start();}catch(e){console.warn('Audio nicht verfügbar',e);}}
