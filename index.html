@@ -680,7 +680,7 @@ $('authForm').addEventListener('submit',async e=>{
 $('privateBucketTestBtn').onclick=async()=>{
  const btn=$('privateBucketTestBtn'),status=$('privateBucketTestStatus');
  const testValue=$('privateBucketTestInput').value.trim();
- if(!testValue){status.textContent='Bitte gib einen Testwert ein und speichere ihn, bevor du spielst.';$('privateBucketTestInput').focus();return;}
+ if(!testValue){status.textContent='';$('privateBucketTestInput').focus();return;}
   if(testValue.length>100){status.textContent='Bitte gib maximal 100 Zeichen ein.';return;}
  btn.disabled=true;status.textContent='Speichern …';
  try{
@@ -704,7 +704,7 @@ $('privateBucketTestBtn').onclick=async()=>{
   const {error}=await supabase.storage.from('testzahlen').upload(path,new Blob([JSON.stringify(testRecord,null,2)],{type:'application/json'}),{upsert:false,contentType:'application/json'});
   if(error)throw error;
   $('privateBucketTestInput').value='';
-  status.textContent='Testwert erfolgreich gespeichert. Du kannst jetzt zum Spiel zurückkehren.';
+  status.textContent='';
   $('privateTestContinueBtn').style.display='block';
  }catch(err){
   status.textContent='Speichern fehlgeschlagen: '+(err?.message||'Unbekannter Fehler')+'. Prüfe, ob der Bucket „testzahlen“ privat ist und eine INSERT-Policy angemeldeten Nutzern Uploads direkt ins Hauptverzeichnis erlaubt.';
