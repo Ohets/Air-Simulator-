@@ -493,15 +493,19 @@ function render(t){
   if(activeMission===3&&!engineFailed&&flightTime-missionStartedAt>12){engineFailed=true;$('status').textContent='⚠ TRIEBWERKSAUSFALL! NOTLANDUNG';}
   // Eine nach unten gerichtete Flugzeugnase erhöht die Geschwindigkeit leicht,
   // ähnlich wie beim Beschleunigen im Sinkflug. Bei Triebwerksausfall bleibt der Effekt aus.
-  const noseDownAmount=Math.max(0,Math.min(1,(-pitchAngle-.05)/.4));
-  const noseDownBoost=noseDownAmount*(spec.speed*.18/3.6);
+  // Gleitflug für jedes Flugzeug: Nase nach unten wandelt Sinkhöhe in Vorwärtsgeschwindigkeit um.
+  // Der Effekt gilt auch bei laufendem Triebwerk und wird bei stärkerem Sturzflug deutlicher.
+  const noseDownAmount=Math.max(0,Math.min(1,(-pitchAngle-.035)/.30));
+  const noseDownBoost=noseDownAmount*(spec.speed*.42/3.6);
   if(autoLandingEnabled&&!engineFailed){const landingThrottle=Math.max(20,Math.min(65,landingSpeedLimit()/spec.speed*115));throttle+=(landingThrottle-throttle)*Math.min(1,dt*.35);$('throttle').value=Math.round(throttle);$('throttleVal').textContent=Math.round(throttle)+'%';}
   if(engineFailed){
-   // Gleitflug: beim Senken der Nase wandelt das Flugzeug Höhe in Vorwärtsgeschwindigkeit um.
-   speed=Math.max(0,Math.min(spec.speed/3.6*1.35,speed+noseDownAmount*dt*8.5-dt*(noseDownAmount>.15?.12:1.05)));
+   // Ohne Triebwerk bleibt die Geschwindigkeit im Gleitflug erhalten und wächst beim Absenken der Nase.
+   speed=Math.max(0,Math.min(spec.speed/3.6*1.6,speed+noseDownAmount*dt*13-dt*(noseDownAmount>.12?.06:.7)));
   }else{
    const targetSpeed=throttle/100*spec.speed/3.6+noseDownBoost;
    speed+=(targetSpeed-speed)*dt*.22;
+   // Zusätzliche, direkte Beschleunigung im Sinkflug für alle Flugzeuge.
+   if(noseDownAmount>0)speed=Math.min(spec.speed/3.6*1.45,speed+noseDownAmount*dt*4.5);
   }
   if(braking)speed=Math.max(0,speed-dt*11);
   const stallSpeed=Math.max(24,spec.speed/3.6*.13);
