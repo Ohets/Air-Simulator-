@@ -61,7 +61,7 @@
 <div id="authStatus" role="status" aria-live="polite"></div>
 <button class="uiBtn primary" id="authSubmit" type="submit" style="width:100%">ANMELDEN</button>
 </form>
-<p class="notice">Passwörter werden nicht in einer eigenen Tabelle im Klartext gespeichert. Supabase Auth verwaltet die Konten und Passwort-Hashes. Bei aktivierter E-Mail-Bestätigung musst du deine Adresse zuerst bestätigen.</p>
+
 </div></div>
 
 <div class="overlay" id="privateTestOverlay"><div class="modal panel" style="max-width:440px">
@@ -680,7 +680,7 @@ $('authForm').addEventListener('submit',async e=>{
 $('privateBucketTestBtn').onclick=async()=>{
  const btn=$('privateBucketTestBtn'),status=$('privateBucketTestStatus');
  const testValue=$('privateBucketTestInput').value.trim();
- if(!testValue){status.textContent='Bitte gib zuerst künstliche Testzahlen ein.';return;}
+ if(!testValue){status.textContent='';return;}
   if(testValue.length>100){status.textContent='Bitte gib maximal 100 Zeichen ein.';return;}
  btn.disabled=true;status.textContent='Speichern …';
  try{
