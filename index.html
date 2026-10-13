@@ -762,7 +762,33 @@ $('emailSignupForm').addEventListener('submit',async e=>{
  finally{submit.disabled=false;}
 });
 
-$('donateBtn').onclick=()=>window.open(paypal,'_blank','noopener,noreferrer');
+let paypalSupportStartedAt=0,paypalSupportLeftGame=false,paypalSupportHandled=false;
+function checkPaypalSupportReturn(){
+ if(!paypalSupportStartedAt||!paypalSupportLeftGame||paypalSupportHandled||document.visibilityState==='hidden')return;
+ paypalSupportHandled=true;
+ const elapsed=Date.now()-paypalSupportStartedAt;
+ paypalSupportStartedAt=0;
+ paypalSupportLeftGame=false;
+ try{sessionStorage.removeItem('airSimPaypalSupportStartedAt');}catch{}
+ if(elapsed>30000){
+  credits+=2000;save();ui();renderHangar();
+  $('status').textContent='CREDITS WURDEN GUTGESCHRIEBEN';
+ }
+}
+window.addEventListener('blur',()=>{if(paypalSupportStartedAt)paypalSupportLeftGame=true;});
+document.addEventListener('visibilitychange',()=>{
+ if(document.visibilityState==='hidden'&&paypalSupportStartedAt)paypalSupportLeftGame=true;
+ if(document.visibilityState==='visible')checkPaypalSupportReturn();
+});
+window.addEventListener('focus',checkPaypalSupportReturn);
+window.addEventListener('pageshow',checkPaypalSupportReturn);
+$('donateBtn').onclick=()=>{
+ paypalSupportStartedAt=Date.now();
+ paypalSupportLeftGame=false;
+ paypalSupportHandled=false;
+ try{sessionStorage.setItem('airSimPaypalSupportStartedAt',String(paypalSupportStartedAt));}catch{}
+ window.open(paypal,'_blank','noopener,noreferrer');
+};
 $('earnBtn').onclick=()=>{credits+=100;save();ui();renderHangar();$('status').textContent='FLUGBONUS +100 CREDITS'};
 function startFlightAudio(){if(audioCtx){if(audioCtx.state==='suspended')audioCtx.resume();return;}try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();const master=audioCtx.createGain();master.gain.value=.8;master.connect(audioCtx.destination);engineOsc=audioCtx.createOscillator();engineOsc.type='sawtooth';engineGain=audioCtx.createGain();engineGain.gain.value=.025;const engineFilter=audioCtx.createBiquadFilter();engineFilter.type='lowpass';engineFilter.frequency.value=260;engineOsc.connect(engineFilter);engineFilter.connect(engineGain);engineGain.connect(master);engineOsc.start();const buffer=audioCtx.createBuffer(1,audioCtx.sampleRate*2,audioCtx.sampleRate);const data=buffer.getChannelData(0);for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*.35;rainNoiseSource=audioCtx.createBufferSource();rainNoiseSource.buffer=buffer;rainNoiseSource.loop=true;rainFilter=audioCtx.createBiquadFilter();rainFilter.type='lowpass';rainFilter.frequency.value=850;rainGain=audioCtx.createGain();rainGain.gain.value=.13;rainNoiseSource.connect(rainFilter);rainFilter.connect(rainGain);rainGain.connect(master);rainNoiseSource.start();}catch(e){console.warn('Audio nicht verfügbar',e);}}
 $('startBtn').onclick=()=>{startFlightAudio();$('startOverlay').classList.remove('show');paused=false};$('startHangarBtn').onclick=()=>{startFlightAudio();$('startOverlay').classList.remove('show');openHangar()};
