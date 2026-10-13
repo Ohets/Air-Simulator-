@@ -101,26 +101,26 @@ const supabase = createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{
 
 const paypal='https://www.paypal.com/donate/?hosted_button_id=HF3HYZ9J3QV4U';
 const planes=[
-{name:'Cessna 172',type:'Einmotoriger Trainer',price:0,speed:220,color:0xf2f4f7,emoji:'🛩️',size:1},
-{name:'Piper PA-28',type:'Leichtflugzeug',price:250,speed:240,color:0xffcf55,emoji:'🛩️',size:1},
-{name:'Beechcraft King Air',type:'Zweimotoriger Turboprop',price:650,speed:460,color:0xe9edf5,emoji:'✈️',size:1.25},
-{name:'DHC-6 Twin Otter',type:'STOL · Regional',price:900,speed:300,color:0xffb64d,emoji:'✈️',size:1.3},
-{name:'Pilatus PC-12',type:'Turboprop Business',price:1200,speed:500,color:0xffffff,emoji:'✈️',size:1.25},
-{name:'Embraer E190',type:'Regionaljet',price:1800,speed:870,color:0x58b6ff,emoji:'🛫',size:1.7},
-{name:'Airbus A320',type:'Narrow-body Airliner',price:2500,speed:850,color:0xf5f7fb,emoji:'🛫',size:1.8},
-{name:'Boeing 737-800',type:'Narrow-body Airliner',price:2800,speed:850,color:0xffffff,emoji:'🛫',size:1.8},
-{name:'Airbus A321neo',type:'Langstrecken-Option',price:3200,speed:880,color:0xe8f4ff,emoji:'🛫',size:2},
-{name:'Boeing 757',type:'Mittelstreckenjet',price:3600,speed:900,color:0xf0f2f5,emoji:'🛫',size:1.9},
-{name:'Airbus A330',type:'Wide-body Airliner',price:4200,speed:910,color:0xe7edf4,emoji:'✈️',size:2.3},
-{name:'Boeing 787 Dreamliner',type:'Effizienter Langstreckenjet',price:4800,speed:920,color:0xf9fbff,emoji:'✈️',size:2.4},
-{name:'Airbus A350',type:'Moderner Langstreckenjet',price:5500,speed:930,color:0xf4f5fa,emoji:'✈️',size:2.5},
-{name:'Boeing 777-300ER',type:'Großer Langstreckenjet',price:6200,speed:930,color:0xffffff,emoji:'✈️',size:2.7},
-{name:'Airbus A380',type:'Doppelstöckiger Jumbo',price:7000,speed:900,color:0xeaf0f7,emoji:'🛬',size:3},
-{name:'Boeing 747-8',type:'Jumbojet',price:7500,speed:920,color:0xf4f7fa,emoji:'🛬',size:2.9},
-{name:'Concorde',type:'Überschall-Passagierjet',price:8500,speed:2100,color:0xf8fbff,emoji:'🚀',size:2.1},
-{name:'C-130 Hercules',type:'Militärischer Transporter',price:5000,speed:590,color:0x7b8d77,emoji:'🛩️',size:2.1},
-{name:'Airbus A400M',type:'Taktischer Transporter',price:5800,speed:780,color:0x899889,emoji:'🛩️',size:2.2},
-{name:'F/A-18 Hornet',type:'Kampfjet',price:10000,speed:1900,color:0x8899aa,emoji:'🛩️',size:1.5}
+{name:'Skytrainer S1',type:'Einmotoriger Trainer',price:0,speed:220,color:0xf2f4f7,emoji:'🛩️',size:1},
+{name:'Cloudrunner L2',type:'Leichtflugzeug',price:250,speed:240,color:0xffcf55,emoji:'🛩️',size:1},
+{name:'AeroTwin 65',type:'Zweimotoriger Turboprop',price:650,speed:460,color:0xe9edf5,emoji:'✈️',size:1.25},
+{name:'Islandhopper T6',type:'STOL · Regional',price:900,speed:300,color:0xffb64d,emoji:'✈️',size:1.3},
+{name:'Skycruiser P12',type:'Turboprop Business',price:1200,speed:500,color:0xffffff,emoji:'✈️',size:1.25},
+{name:'Jetstream R90',type:'Regionaljet',price:1800,speed:870,color:0x58b6ff,emoji:'🛫',size:1.7},
+{name:'Airliner A20',type:'Narrow-body Airliner',price:2500,speed:850,color:0xf5f7fb,emoji:'🛫',size:1.8},
+{name:'Airliner B70',type:'Narrow-body Airliner',price:2800,speed:850,color:0xffffff,emoji:'🛫',size:1.8},
+{name:'Airliner A21X',type:'Langstrecken-Option',price:3200,speed:880,color:0xe8f4ff,emoji:'🛫',size:2},
+{name:'Skyliner M75',type:'Mittelstreckenjet',price:3600,speed:900,color:0xf0f2f5,emoji:'🛫',size:1.9},
+{name:'Longhaul A33',type:'Wide-body Airliner',price:4200,speed:910,color:0xe7edf4,emoji:'✈️',size:2.3},
+{name:'Dreamliner X8',type:'Effizienter Langstreckenjet',price:4800,speed:920,color:0xf9fbff,emoji:'✈️',size:2.4},
+{name:'AeroStar A35',type:'Moderner Langstreckenjet',price:5500,speed:930,color:0xf4f5fa,emoji:'✈️',size:2.5},
+{name:'Longhaul B77',type:'Großer Langstreckenjet',price:6200,speed:930,color:0xffffff,emoji:'✈️',size:2.7},
+{name:'Skygiant A80',type:'Doppelstöckiger Jumbo',price:7000,speed:900,color:0xeaf0f7,emoji:'🛬',size:3},
+{name:'Skygiant B48',type:'Jumbojet',price:7500,speed:920,color:0xf4f7fa,emoji:'🛬',size:2.9},
+{name:'Sonic Arrow S1',type:'Überschall-Passagierjet',price:8500,speed:2100,color:0xf8fbff,emoji:'🚀',size:2.1},
+{name:'CargoLift C13',type:'Militärischer Transporter',price:5000,speed:590,color:0x7b8d77,emoji:'🛩️',size:2.1},
+{name:'CargoLift A40',type:'Taktischer Transporter',price:5800,speed:780,color:0x899889,emoji:'🛩️',size:2.2},
+{name:'FalconStrike F18',type:'Kampfjet',price:10000,speed:1900,color:0x8899aa,emoji:'🛩️',size:1.5}
 ];
 const saved=(()=>{try{return JSON.parse(localStorage.getItem('airSimSave')||'{}')}catch{return {}}})();
 let credits=Number.isFinite(saved.credits)?saved.credits:1500,owned=new Set(Array.isArray(saved.owned)?saved.owned:[0]),current=Math.max(0,Math.min(19,saved.current||0));if(!owned.has(0))owned.add(0);
