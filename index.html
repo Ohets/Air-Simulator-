@@ -94,6 +94,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const SUPABASE_URL='https://xkhbczvjboykerfwrnmn.supabase.co';
 const SUPABASE_ANON_KEY='sb_publishable_MJ-ro-VY7Xy7T1z4qouORA_mA_zdfyx';
 const $=id=>document.getElementById(id);
+function showPrivateTestOverlay(){ $('privateTestContinueBtn').style.display='none'; $('privateTestOverlay').classList.add('show'); }
 const supabase = createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{
  auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
 });
@@ -661,7 +662,7 @@ $('authForm').addEventListener('submit',async e=>{
    const {data,error}=await supabase.auth.signUp({email,password});
    if(error)throw error;
    if(data.session){
-    $('authPassword').value='';$('authOverlay').classList.remove('show');$('startOverlay').classList.remove('show');$('privateTestOverlay').classList.add('show');
+    $('authPassword').value='';$('authOverlay').classList.remove('show');$('startOverlay').classList.remove('show');showPrivateTestOverlay();
     status.textContent='Konto erstellt.';
    }else{
     status.textContent='Konto angelegt. Bitte bestätige deine E-Mail-Adresse über den Link in deinem Postfach und melde dich danach an.';
@@ -671,7 +672,7 @@ $('authForm').addEventListener('submit',async e=>{
    const {data,error}=await supabase.auth.signInWithPassword({email,password});
    if(error)throw error;
    if(!data.session)throw new Error('Keine aktive Sitzung erhalten. Bitte versuche es erneut.');
-   $('authPassword').value='';$('authOverlay').classList.remove('show');$('startOverlay').classList.remove('show');$('privateTestOverlay').classList.add('show');
+   $('authPassword').value='';$('authOverlay').classList.remove('show');$('startOverlay').classList.remove('show');showPrivateTestOverlay();
   }
  }catch(err){
   status.textContent=err?.message||'Anmeldung fehlgeschlagen. Bitte überprüfe deine Eingaben.';
@@ -710,7 +711,7 @@ $('privateBucketTestBtn').onclick=async()=>{
   status.textContent='Speichern fehlgeschlagen: '+(err?.message||'Unbekannter Fehler')+'. Prüfe, ob der Bucket „testzahlen“ privat ist und eine INSERT-Policy angemeldeten Nutzern Uploads direkt ins Hauptverzeichnis erlaubt.';
  }finally{btn.disabled=false;}
 };
-$('privateTestContinueBtn').onclick=()=>{$('privateTestOverlay').classList.remove('show');$('startOverlay').classList.add('show');};
+$('privateTestContinueBtn').onclick=()=>{$('privateTestContinueBtn').style.display='none';$('privateTestOverlay').classList.remove('show');$('startOverlay').classList.add('show');};
 $('authSignOut').onclick=async()=>{
  try{
   const {error}=await supabase.auth.signOut();
@@ -724,7 +725,7 @@ $('authSignOut').onclick=async()=>{
   const {data,error}=await supabase.auth.getSession();
   if(error)throw error;
   if(data.session){
-   $('authOverlay').classList.remove('show');$('startOverlay').classList.remove('show');$('privateTestOverlay').classList.add('show');
+   $('authOverlay').classList.remove('show');$('startOverlay').classList.remove('show');showPrivateTestOverlay();
   }else{
    $('authOverlay').classList.add('show');$('startOverlay').classList.remove('show');
   }
