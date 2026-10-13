@@ -259,17 +259,17 @@ function addOvergrownCity(cx,cz,spreadX,spreadZ,count){
  for(const z of [-3620,-3600]){nyCable([[70,30,z],[170,70,z],[285,76,z],[400,70,z],[500,30,z]],.75);nyCable([[70,10,z],[170,62,z],[285,66,z],[400,62,z],[500,10,z]],.5);}
  for(let x=90;x<490;x+=18){const hanger=new THREE.Mesh(new THREE.CylinderGeometry(.28,.28,22,5),bridgeCable);hanger.position.set(x,7,-3610);scene.add(hanger);}
  // Statue of Liberty: island, stone pedestal, green figure, crown and torch.
- const statueBase=new THREE.Mesh(new THREE.CylinderGeometry(43,52,7,8),new THREE.MeshStandardMaterial({color:0x686e70,roughness:1}));statueBase.position.set(-650,-11,-3660);scene.add(statueBase);
- const statuePed=new THREE.Mesh(new THREE.BoxGeometry(42,40,42),new THREE.MeshStandardMaterial({color:0x9c8b76,roughness:1}));statuePed.position.set(-650,9,-3660);scene.add(statuePed);
+ const statueBase=new THREE.Mesh(new THREE.CylinderGeometry(43,52,7,8),new THREE.MeshStandardMaterial({color:0x686e70,roughness:1}));statueBase.position.set(-950,-11,-3490);scene.add(statueBase);
+ const statuePed=new THREE.Mesh(new THREE.BoxGeometry(42,40,42),new THREE.MeshStandardMaterial({color:0x9c8b76,roughness:1}));statuePed.position.set(-950,9,-3490);scene.add(statuePed);
  const patina=new THREE.MeshStandardMaterial({color:0x4b9b83,roughness:.72,metalness:.18}),patinaLight=new THREE.MeshStandardMaterial({color:0x69b49a,roughness:.7,metalness:.12});
- const robe=new THREE.Mesh(new THREE.CylinderGeometry(7,13,31,9),patina);robe.position.set(-650,44,-3660);scene.add(robe);
- const shoulders=new THREE.Mesh(new THREE.SphereGeometry(8,10,8),patina);shoulders.scale.set(1,.7,.8);shoulders.position.set(-650,59,-3660);scene.add(shoulders);
- const head=new THREE.Mesh(new THREE.SphereGeometry(4.6,10,8),patinaLight);head.position.set(-650,68,-3660);scene.add(head);
- const crown=new THREE.Mesh(new THREE.ConeGeometry(6,8,7),patina);crown.position.set(-650,76,-3660);scene.add(crown);
- const arm=new THREE.Mesh(new THREE.CylinderGeometry(2.3,3,22,7),patina);arm.position.set(-638,68,-3660);arm.rotation.z=-.48;scene.add(arm);
- const torchArm=new THREE.Mesh(new THREE.CylinderGeometry(1.8,2.2,17,7),patina);torchArm.position.set(-631,77,-3660);torchArm.rotation.z=-.16;scene.add(torchArm);
- const torch=new THREE.Mesh(new THREE.CylinderGeometry(2.6,1.8,5,8),patinaLight);torch.position.set(-630,86,-3660);scene.add(torch);
- const flame=new THREE.Mesh(new THREE.SphereGeometry(3,8,7),new THREE.MeshStandardMaterial({color:0xffc75c,emissive:0xb96812,emissiveIntensity:.55}));flame.scale.set(.65,1.6,.65);flame.position.set(-630,91,-3660);scene.add(flame);
+ const robe=new THREE.Mesh(new THREE.CylinderGeometry(7,13,31,9),patina);robe.position.set(-950,44,-3490);scene.add(robe);
+ const shoulders=new THREE.Mesh(new THREE.SphereGeometry(8,10,8),patina);shoulders.scale.set(1,.7,.8);shoulders.position.set(-950,59,-3490);scene.add(shoulders);
+ const head=new THREE.Mesh(new THREE.SphereGeometry(4.6,10,8),patinaLight);head.position.set(-950,68,-3490);scene.add(head);
+ const crown=new THREE.Mesh(new THREE.ConeGeometry(6,8,7),patina);crown.position.set(-950,76,-3490);scene.add(crown);
+ const arm=new THREE.Mesh(new THREE.CylinderGeometry(2.3,3,22,7),patina);arm.position.set(-938,68,-3490);arm.rotation.z=-.48;scene.add(arm);
+ const torchArm=new THREE.Mesh(new THREE.CylinderGeometry(1.8,2.2,17,7),patina);torchArm.position.set(-931,77,-3490);torchArm.rotation.z=-.16;scene.add(torchArm);
+ const torch=new THREE.Mesh(new THREE.CylinderGeometry(2.6,1.8,5,8),patinaLight);torch.position.set(-930,86,-3490);scene.add(torch);
+ const flame=new THREE.Mesh(new THREE.SphereGeometry(3,8,7),new THREE.MeshStandardMaterial({color:0xffc75c,emissive:0xb96812,emissiveIntensity:.55}));flame.scale.set(.65,1.6,.65);flame.position.set(-930,91,-3490);scene.add(flame);
  const book=new THREE.Mesh(new THREE.BoxGeometry(5,7,2),patinaLight);book.position.set(-659,48,-3655);scene.add(book);
  for(const z of [-3070,-3330,-3890,-4240]){const dock=new THREE.Mesh(new THREE.BoxGeometry(120,2,18),new THREE.MeshStandardMaterial({color:0x8d887c,roughness:1}));dock.position.set(-320,-13.2,z);scene.add(dock);}
  // AIRPORT BESIDE THE STATUE OF LIBERTY: runway, taxiway, terminal and apron.
