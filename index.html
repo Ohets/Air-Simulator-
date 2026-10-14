@@ -29,7 +29,7 @@
 </style>
 </head>
 <body>
-<div id="browserDataWarning" role="alert" style="position:fixed;z-index:99999;top:124px;left:50%;transform:translateX(-50%);width:calc(100% - 20px);max-width:760px;padding:10px 14px;border:2px solid #ffcc55;border-radius:10px;background:rgba(75,31,5,.94);color:#fff4cf;text-align:center;font-size:13px;font-weight:800;line-height:1.4;box-shadow:0 4px 18px #0008;pointer-events:none">⚠️ WICHTIG: Browserdaten bzw. Website-Daten nicht löschen! Sonst können deine Credits und dein Spielfortschritt verloren gehen.</div>
+
 <div id="hud">
  <div class="top panel">
   <div><div class="brand">AIR <span>SIMULATOR</span></div><div class="stat" id="planeName">Cessna 172 · Trainer</div></div>
@@ -56,6 +56,7 @@
 <div class="badge">AIR SIMULATOR ACCOUNT</div><h2 style="margin:8px 0">Anmelden oder Konto erstellen</h2>
 <p class="notice">Du brauchst ein Konto, um Air Simulator zu spielen. Deine Anmeldung wird über Supabase Auth verwaltet.</p>
 <p class="notice" id="legalLoginNotice">Hinweis zur kommerziellen Nutzung: Prüfe vor einer Veröffentlichung, ob alle verwendeten 3D-Modelle, Texturen, Sounds, Logos und sonstigen Inhalte selbst erstellt oder passend lizenziert sind. Ähnlichkeiten mit realen Wahrzeichen können gesonderte Rechte betreffen. Dieser Hinweis ersetzt keine Rechtsberatung.</p>
+<div id="browserDataWarning" role="alert" style="margin:10px 0;padding:10px 12px;border:2px solid #ffcc55;border-radius:10px;background:rgba(75,31,5,.94);color:#fff4cf;text-align:center;font-size:13px;font-weight:800;line-height:1.4">⚠️ WICHTIG: Browserdaten bzw. Website-Daten nicht löschen! Sonst können deine Credits und dein Spielfortschritt verloren gehen.</div>
 <div class="authSwitch"><button class="uiBtn primary" id="authModeLogin" type="button">ANMELDEN</button><button class="uiBtn" id="authModeSignup" type="button">KONTO ERSTELLEN</button></div>
 <form id="authForm">
 <label for="authEmail" class="muted">E-Mail-Adresse</label><input id="authEmail" type="email" autocomplete="email" maxlength="254" placeholder="deine@email.at" required>
@@ -691,6 +692,7 @@ function setAuthMode(mode){
  $('authSubmit').textContent=mode==='login'?'ANMELDEN':'KONTO ERSTELLEN';
  $('authPassword').autocomplete=mode==='login'?'current-password':'new-password';
  $('legalLoginNotice').style.display=mode==='login'?'':'none';
+ $('browserDataWarning').style.display=mode==='login'?'':'none';
  $('authStatus').textContent='';
 }
 $('authModeLogin').onclick=()=>setAuthMode('login');
