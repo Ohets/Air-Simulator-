@@ -55,6 +55,7 @@
 <div class="overlay show" id="authOverlay"><div class="modal panel" style="max-width:440px">
 <div class="badge">AIR SIMULATOR ACCOUNT</div><h2 style="margin:8px 0">Anmelden oder Konto erstellen</h2>
 <p class="notice">Du brauchst ein Konto, um Air Simulator zu spielen. Deine Anmeldung wird über Supabase Auth verwaltet.</p>
+<p class="notice" id="legalLoginNotice">Hinweis zur kommerziellen Nutzung: Prüfe vor einer Veröffentlichung, ob alle verwendeten 3D-Modelle, Texturen, Sounds, Logos und sonstigen Inhalte selbst erstellt oder passend lizenziert sind. Ähnlichkeiten mit realen Wahrzeichen können gesonderte Rechte betreffen. Dieser Hinweis ersetzt keine Rechtsberatung.</p>
 <div class="authSwitch"><button class="uiBtn primary" id="authModeLogin" type="button">ANMELDEN</button><button class="uiBtn" id="authModeSignup" type="button">KONTO ERSTELLEN</button></div>
 <form id="authForm">
 <label for="authEmail" class="muted">E-Mail-Adresse</label><input id="authEmail" type="email" autocomplete="email" maxlength="254" placeholder="deine@email.at" required>
@@ -689,6 +690,7 @@ function setAuthMode(mode){
  $('authModeSignup').classList.toggle('primary',mode==='signup');
  $('authSubmit').textContent=mode==='login'?'ANMELDEN':'KONTO ERSTELLEN';
  $('authPassword').autocomplete=mode==='login'?'current-password':'new-password';
+ $('legalLoginNotice').style.display=mode==='login'?'':'none';
  $('authStatus').textContent='';
 }
 $('authModeLogin').onclick=()=>setAuthMode('login');
