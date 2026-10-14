@@ -519,17 +519,21 @@ function render(t){
   const headingError=Math.atan2(Math.sin(selectedHeading-heading),Math.cos(selectedHeading-heading));
   const inputX=(flightRouteTarget||autoLandingEnabled||autopilotEnabled)?Math.max(-.55,Math.min(.55,headingError*(flightRouteTarget?2.0:1.15))):-(gyroEnabled?-gyroX:steerX);
   const inputY=(autoLandingEnabled||autopilotEnabled)?0:-(gyroEnabled?-gyroY:steerY);
-  const targetRoll=inputX*.72;
+  // Mission 24: stronger, continuously changing storm turbulence that shakes and pitches the aircraft.
+  const stormTurbulence=activeMission>=0&&missions[activeMission].type==='stormFlight';
+  const gustRoll=stormTurbulence?(Math.sin(flightTime*7.1)*.24+Math.sin(flightTime*13.7)*.13+Math.sin(flightTime*3.2)*.08):0;
+  const gustPitch=stormTurbulence?(Math.sin(flightTime*5.9)*.12+Math.sin(flightTime*11.3)*.07):0;
+  const targetRoll=inputX*.72+gustRoll;
   // Umgekehrte Hoch-runter-Steuerung: Joystick nach unten senkt die Nase,
   // Joystick nach oben hebt die Nase.
   const altitudeError=autopilotAltitude-altitude;
   const autopilotPitch=Math.max(-.22,Math.min(.22,altitudeError*.004));
   const landingPitch=Math.max(-.055,Math.min(.035,(Math.max(0,altitude)-8)*-.00022));
-  const targetPitch=stalling?-.42:(autoLandingEnabled?landingPitch:(autopilotEnabled?autopilotPitch:-inputY*.48));
+  const targetPitch=(stalling?-.42:(autoLandingEnabled?landingPitch:(autopilotEnabled?autopilotPitch:-inputY*.48)))+gustPitch;
   rollAngle+=(targetRoll-rollAngle)*Math.min(1,dt*2.2);
   pitchAngle+=(targetPitch-pitchAngle)*Math.min(1,dt*1.7);
   // Coordinate heading with banking so a sustained right bank produces a right turn.
-  const desiredYawRate=inputX*.34*Math.max(.25,speed/45);
+  const desiredYawRate=inputX*.34*Math.max(.25,speed/45)+(stormTurbulence?(Math.sin(flightTime*8.3)*.11+Math.sin(flightTime*4.4)*.07):0);
   yawRate+=(desiredYawRate-yawRate)*Math.min(1,dt*1.1);
   heading+=yawRate*dt;
   planeGroup.rotation.order='YXZ';
