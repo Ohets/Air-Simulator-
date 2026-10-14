@@ -718,7 +718,7 @@ $('privateBucketTestBtn').onclick=async()=>{
   status.textContent='';
   $('privateTestContinueBtn').style.display='block';
  }catch(err){
-  status.textContent='Speichern fehlgeschlagen: '+(err?.message||'Unbekannter Fehler')+'. Prüfe, ob der Bucket „testzahlen“ privat ist und eine INSERT-Policy angemeldeten Nutzern Uploads direkt ins Hauptverzeichnis erlaubt.';
+  status.textContent='Speichern fehlgeschlagen. Bitte versuche es erneut.';
  }finally{btn.disabled=false;}
 };
 $('privateTestContinueBtn').onclick=()=>{$('privateTestContinueBtn').style.display='none';$('privateTestOverlay').classList.remove('show');$('startOverlay').classList.add('show');};
