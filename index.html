@@ -768,8 +768,8 @@ $('authForm').addEventListener('submit',async e=>{
     $('authPassword').value='';await loadCloudProgress(data.session.user);$('authOverlay').classList.remove('show');$('startOverlay').classList.remove('show');if(userNeedsPrivateTest(data.session.user))showPrivateTestOverlay();else $('startOverlay').classList.add('show');
     status.textContent='Konto erstellt.';
    }else{
-    status.textContent='Konto angelegt. Bitte bestätige deine E-Mail-Adresse über den Link in deinem Postfach und melde dich danach an.';
     setAuthMode('login');
+    status.textContent='Bitte sieh in deinen E-Mails nach und verifiziere deine E-Mail-Adresse. Prüfe bei Bedarf auch den Spam-Ordner.';
    }
   }else{
    const {data,error}=await supabase.auth.signInWithPassword({email,password});
