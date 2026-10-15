@@ -167,7 +167,7 @@ function startMission(i){if(activeMission===i)return;if(i>0&&!completedMissions.
 function specApproachSpeed(){return Math.max(24,planes[current].speed/3.6*.38);}
 function landingSpeedLimit(){return Math.max(90,Math.min(240,planes[current].speed*.32));}
 function skipMission(i){if(completedMissions.has(i))return;const m=missions[i];if(credits<m.skip){alert('Du brauchst '+m.skip+' credits to skip this mission.');return;}credits-=m.skip;completedMissions.add(i);if(activeMission===i)activeMission=-1;persistMission();ui();renderMissions();$('status').textContent='MISSION SKIPPED';}
-function finishMission(i){if(i<0)return;const m=missions[i];const alreadyCompleted=completedMissions.has(i);if(!alreadyCompleted){completedMissions.add(i);credits+=m.reward;persistMission();ui();}activeMission=-1;$('footControls').style.display='none';engineFailed=false;setNightMode(false);setStormMode(false);if(missionMarker){scene.remove(missionMarker);missionMarker=null;missionMarkerRing=null;}$('nextMissionBtn').style.display='inline-block';alert(alreadyCompleted?'Mission completed again: '+m.name+'! Deine Belohnung wurde bereits beim ersten Abschluss gutgeschrieben.':'Mission completed: '+m.name+'! You receive '+m.reward+' credits.');renderMissions();updateSceneryButtons();}
+function finishMission(i){if(i<0)return;const m=missions[i];const alreadyCompleted=completedMissions.has(i);if(!alreadyCompleted){completedMissions.add(i);credits+=m.reward;persistMission();ui();}activeMission=-1;$('footControls').style.display='none';engineFailed=false;setNightMode(false);setStormMode(false);if(missionMarker){scene.remove(missionMarker);missionMarker=null;missionMarkerRing=null;}$('nextMissionBtn').style.display='inline-block';alert(alreadyCompleted?'Mission completed again: '+m.name+'! Your reward was already credited when you first completed it.':'Mission completed: '+m.name+'! You receive '+m.reward+' credits.');renderMissions();updateSceneryButtons();}
 let cloudSaveUserId=null,cloudSaveReady=false,cloudSaveTimer=null,cloudSaveErrorShown=false;
 function getGameProgress(){return {version:1,credits,owned:[...owned],current,completedMissions:[...completedMissions],purchasedMissions:[...purchasedMissions],purchasedSceneries:[...purchasedSceneries]};}
 function applyGameProgress(progress){
@@ -194,7 +194,7 @@ async function loadCloudProgress(user){
   }
   cloudSaveReady=true;cloudSaveErrorShown=false;
   ui();renderHangar();renderMissions();updateSceneryButtons();
-  if(data?.progress)$('status').textContent='SPIELFORTSCHRITT AUS DEINEM KONTO GELADEN';
+  if(data?.progress)$('status').textContent='GAME PROGRESS LOADED FROM YOUR ACCOUNT';
   else save();
  }catch(err){
   cloudSaveReady=false;
