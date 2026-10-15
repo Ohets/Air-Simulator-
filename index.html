@@ -199,7 +199,7 @@ async function loadCloudProgress(user){
  }catch(err){
   cloudSaveReady=false;
   console.error('Cloud-Spielstand konnte nicht geladen werden:',err);
-  if(!cloudSaveErrorShown){cloudSaveErrorShown=true;$('authStatus').textContent='Kontospeicherung ist noch nicht eingerichtet. Bitte führe zuerst das SQL für air_simulator_saves in Supabase aus. Dein lokaler Spielstand bleibt erhalten.';}
+  if(!cloudSaveErrorShown){cloudSaveErrorShown=true;$('authStatus').textContent='Kontospeicherung ist noch nicht eingerichtet. Bitte führe zuerst das SQL für air_simulator_saves in Supabase aus. Dein lokaler Spielstand bleibt erhalten.';$('status').textContent='KONTO-SPEICHER NICHT EINGERICHTET · SUPABASE-SQL AUSFÜHREN';}
  }
 }
 function queueCloudSave(){
