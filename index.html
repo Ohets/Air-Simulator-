@@ -217,7 +217,13 @@ function queueCloudSave(){
   }
  },700);
 }
-function save(){const progress=getGameProgress();try{localStorage.setItem('airSimSave',JSON.stringify(progress))}catch{}queueCloudSave();}
+function saveLocalProgress(){try{localStorage.setItem('airSimSave',JSON.stringify(getGameProgress()));return true;}catch(err){console.warn('Lokales Speichern fehlgeschlagen:',err);return false;}}
+function save(){saveLocalProgress();queueCloudSave();}
+// Lokalen Spielstand regelmäßig und beim Verlassen/Hintergrundwechsel sichern.
+window.addEventListener('pagehide',saveLocalProgress);
+window.addEventListener('beforeunload',saveLocalProgress);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveLocalProgress();});
+setInterval(saveLocalProgress,10000);
 function ui(){ $('credits').textContent=credits.toLocaleString('de-AT');$('hangarCredits').textContent=credits.toLocaleString('de-AT');$('planeName').textContent=planes[current].name+' · '+planes[current].type;$('speed').textContent=Math.round(Math.max(0,speed*3.6));$('altitude').textContent=Math.max(0,Math.round(120+altitude));$('throttleVal').textContent=throttle+'%';}
 let scene,camera,renderer,planeGroup,clock=new THREE.Clock(),speed=0,altitude=0,throttle=35,paused=false,gear=true,braking=false,view=0,steerX=0,steerY=0,heading=0,autopilotEnabled=false,autopilotHeading=0,autopilotAltitude=120,autoLandingEnabled=false,flightTime=0,gyroEnabled=false,gyroZeroBeta=null,gyroZeroGamma=null,gyroX=0,gyroY=0,rollAngle=0,pitchAngle=0,yawRate=0,stalling=false,rainPoints=null,rainPositions=null,audioCtx=null,engineOsc=null,engineGain=null,rainGain=null,rainFilter=null,rainNoiseSource=null;
 let flightRouteTarget=null,flightRouteName='';
