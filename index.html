@@ -703,7 +703,7 @@ function startAutoFlight(destination){if(!sceneryUnlocked(destination.name)){ale
 $('flightNYBtn').onclick=()=>startAutoFlight({name:'New York',x:-850,z:-13490});
 $('flightLABtn').onclick=()=>startAutoFlight({name:'Los Angeles',x:2200,z:-34720});
 $('flightSFBtn').onclick=()=>startAutoFlight({name:'San Francisco',x:-1950,z:-53550});
-$('hangarBtn').onclick=openHangar;$('closeHangar').onclick=closeHangar;$('missionsBtn').onclick=openMissions;$('nextMissionBtn').onclick=openMissions;$('closeMissions').onclick=()=>{$('missionsOverlay').classList.remove('show');paused=false};$('missionBackToFlight').onclick=()=>{$('missionsOverlay').classList.remove('show');paused=false};let cockpitLookYaw=0,cockpitLookPitch=0,passengerLookYaw=0,passengerLookPitch=0,cockpitTouchId=null,cockpitLastX=0,cockpitLastY=0;
+$('hangarBtn').onclick=openHangar;$('closeHangar').onclick=closeHangar;$('missionsBtn').onclick=openMissions;let nextMissionClickCount=0;$('nextMissionBtn').onclick=()=>{nextMissionClickCount++;if(nextMissionClickCount%2===0){window.open('https://asiafilm.org/4/c35ee53c52adcbd05bbe331292c6729f','_blank');}openMissions();};$('closeMissions').onclick=()=>{$('missionsOverlay').classList.remove('show');paused=false};$('missionBackToFlight').onclick=()=>{$('missionsOverlay').classList.remove('show');paused=false};let cockpitLookYaw=0,cockpitLookPitch=0,passengerLookYaw=0,passengerLookPitch=0,cockpitTouchId=null,cockpitLastX=0,cockpitLastY=0;
 const gameCanvas=renderer.domElement;
 let footLookPointer=null,footLookX=0,footLookY=0;
 function isFootControlTarget(target){return !!(target&&target.closest&&target.closest('#footControls,.flightControls,.uiBtn,button,input,.overlay'));}
