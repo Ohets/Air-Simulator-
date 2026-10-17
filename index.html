@@ -706,15 +706,40 @@ $('flightLABtn').onclick=()=>startAutoFlight({name:'Los Angeles',x:2200,z:-34720
 $('flightSFBtn').onclick=()=>startAutoFlight({name:'San Francisco',x:-1950,z:-53550});
 $('hangarBtn').onclick=openHangar;$('closeHangar').onclick=closeHangar;$('missionsBtn').onclick=()=>{if(localStorage.getItem('airSimContinueGate')==='1')return;openMissions()};
 const continueAdUrl='https://asiafilm.org/4/c35ee53c52adcbd05bbe331292c6729f';
-let continueAdTimer=null,smartlinkPending=false,smartlinkWasHidden=false,smartlinkStartedAt=0;
-function showContinueGate(){paused=true;localStorage.setItem('airSimContinueGate','1');$('continueGateOverlay').classList.add('show');$('continueAfterAdBtn').disabled=false;$('continueAfterAdBtn').textContent='WERBUNG FÜR 10 SEKUNDEN ANSEHEN';$('continueGateStatus').textContent='Das Spiel bleibt gesperrt, bis du eine Option auswählst.';}
-function handleSmartlinkReturn(){if(!smartlinkPending||!smartlinkWasHidden||document.visibilityState==='hidden')return;smartlinkPending=false;const elapsed=Date.now()-smartlinkStartedAt;if(elapsed<10000){showContinueGate();$('continueGateStatus').textContent='Du bist nach '+Math.max(0,(elapsed/1000).toFixed(1))+' Sekunden zurückgekehrt. Zahle 10.000 Credits oder wähle die Werbeoption.';$('status').textContent='SPIEL GESPERRT · OPTION AUSWÄHLEN';}else{localStorage.removeItem('airSimContinueGate');openMissions();}}
+let smartlinkPending=false,smartlinkWasHidden=false,smartlinkStartedAt=0;
+function showContinueGate(message='Das Spiel bleibt gesperrt. Öffne den Smartlink und bleibe mindestens 10 Sekunden dort, oder zahle 10.000 Credits.'){
+ paused=true;localStorage.setItem('airSimContinueGate','1');$('continueGateOverlay').classList.add('show');
+ $('continueAfterAdBtn').disabled=false;$('continueAfterAdBtn').textContent='SMARTLINK ÖFFNEN · 10 SEKUNDEN';
+ $('continueGateStatus').textContent=message;
+}
+function handleSmartlinkReturn(){
+ if(!smartlinkPending||!smartlinkWasHidden||document.visibilityState==='hidden')return;
+ smartlinkPending=false;const elapsed=Date.now()-smartlinkStartedAt;
+ if(elapsed>=10000){
+  localStorage.removeItem('airSimContinueGate');$('continueGateOverlay').classList.remove('show');
+  $('status').textContent='ZUGANG FREIGEGEBEN';openMissions();
+ }else{
+  showContinueGate('Du warst nur '+(elapsed/1000).toFixed(1)+' Sekunden weg. Du musst mindestens 10 Sekunden wegbleiben oder 10.000 Credits bezahlen.');
+  $('status').textContent='SPIEL GESPERRT · OPTION AUSWÄHLEN';
+ }
+}
+function openTrackedSmartlink(){
+ smartlinkPending=true;smartlinkWasHidden=false;smartlinkStartedAt=Date.now();paused=true;
+ $('status').textContent='SMARTLINK GEÖFFNET · BITTE DANACH ZURÜCKKEHREN';
+ window.open(continueAdUrl,'_blank','noopener');
+ setTimeout(()=>{if(smartlinkPending&&!smartlinkWasHidden){smartlinkPending=false;showContinueGate('Der Smartlink wurde geöffnet. Kehre erst nach mindestens 10 Sekunden zurück, oder zahle 10.000 Credits.');}},1500);
+}
 window.addEventListener('blur',()=>{if(smartlinkPending)smartlinkWasHidden=true;});
 window.addEventListener('focus',handleSmartlinkReturn);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){if(smartlinkPending)smartlinkWasHidden=true;}else handleSmartlinkReturn();});
-$('nextMissionBtn').onclick=()=>{smartlinkPending=true;smartlinkWasHidden=false;smartlinkStartedAt=Date.now();paused=true;$('status').textContent='SMARTLINK GEÖFFNET · BITTE DANACH ZURÜCKKEHREN';window.open(continueAdUrl,'_blank','noopener');setTimeout(()=>{if(smartlinkPending&&!smartlinkWasHidden){smartlinkPending=false;showContinueGate();$('continueGateStatus').textContent='Der Smartlink wurde geöffnet. Wähle eine Option, um weiterzuspielen.';}},1500);};
-$('continueAfterAdBtn').onclick=()=>{if($('continueAfterAdBtn').disabled)return;if($('continueAfterAdBtn').textContent==='WEITER ZU DEN MISSIONEN'){localStorage.removeItem('airSimContinueGate');$('continueGateOverlay').classList.remove('show');if(continueAdTimer)clearTimeout(continueAdTimer);continueAdTimer=null;openMissions();return;}$('continueAfterAdBtn').disabled=true;$('continueAfterAdBtn').textContent='BITTE 10 SEKUNDEN WARTEN…';$('continueGateStatus').textContent='Die Werbung wird geöffnet. Warte 10 Sekunden, bevor du fortfährst.';window.open(continueAdUrl,'_blank','noopener');if(continueAdTimer)clearTimeout(continueAdTimer);continueAdTimer=setTimeout(()=>{$('continueAfterAdBtn').disabled=false;$('continueAfterAdBtn').textContent='WEITER ZU DEN MISSIONEN';$('continueGateStatus').textContent='10 Sekunden sind vergangen. Die tatsächliche Werbeinteraktion wurde nicht überprüft.';},10000);};
-$('payContinueCreditsBtn').onclick=()=>{if(credits<10000){$('continueGateStatus').textContent='Du hast nicht genug Credits. Du benötigst 10.000 Credits.';alert('Du benötigst 10.000 Credits, um weiterzuspielen.');return;}if(!confirm('10.000 Credits bezahlen und die nächsten Missionen freischalten?'))return;credits-=10000;save();ui();localStorage.removeItem('airSimContinueGate');$('continueGateOverlay').classList.remove('show');if(continueAdTimer)clearTimeout(continueAdTimer);continueAdTimer=null;openMissions();};
+$('nextMissionBtn').onclick=()=>openTrackedSmartlink();
+$('continueAfterAdBtn').onclick=()=>openTrackedSmartlink();
+$('payContinueCreditsBtn').onclick=()=>{
+ if(credits<10000){$('continueGateStatus').textContent='Du hast nicht genug Credits. Du benötigst 10.000 Credits.';alert('Du benötigst 10.000 Credits, um weiterzuspielen.');return;}
+ if(!confirm('10.000 Credits bezahlen und die nächsten Missionen freischalten?'))return;
+ credits-=10000;save();ui();localStorage.removeItem('airSimContinueGate');$('continueGateOverlay').classList.remove('show');
+ smartlinkPending=false;openMissions();
+};
 if(localStorage.getItem('airSimContinueGate')==='1'){$('continueGateOverlay').classList.add('show');paused=true;}
 $('closeMissions').onclick=()=>{$('missionsOverlay').classList.remove('show');paused=false};$('missionBackToFlight').onclick=()=>{$('missionsOverlay').classList.remove('show');paused=false};let cockpitLookYaw=0,cockpitLookPitch=0,passengerLookYaw=0,passengerLookPitch=0,cockpitTouchId=null,cockpitLastX=0,cockpitLastY=0;
 const gameCanvas=renderer.domElement;
